@@ -1,0 +1,89 @@
+.lookupContainer {
+  position: relative;
+  width: 100%;
+}
+
+.lookupInput {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #DFE1E6;
+  border-radius: 3px;
+  font-size: 14px;
+  background-color: white;
+  color: #172B4D;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.lookupInput:focus {
+  outline: none;
+  border-color: #0052CC;
+  box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.1);
+}
+
+.lookupInput:disabled {
+  background-color: #F4F5F7;
+  color: #6B778C;
+  cursor: not-allowed;
+}
+
+.loadingIndicator {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #6B778C;
+  pointer-events: none;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #DFE1E6;
+  border-radius: 3px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 4px;
+}
+
+.option {
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #F4F5F7;
+}
+
+.option:last-child {
+  border-bottom: none;
+}
+
+.option:hover {
+  background-color: #F4F5F7;
+}
+
+.optionLabel {
+  font-size: 14px;
+  color: #172B4D;
+  font-weight: 500;
+}
+
+.optionDescription {
+  font-size: 12px;
+  color: #6B778C;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.noResults {
+  padding: 12px;
+  text-align: center;
+  color: #6B778C;
+  font-size: 14px;
+}
+

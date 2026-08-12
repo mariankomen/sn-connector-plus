@@ -1,0 +1,241 @@
+(function process(request, response) {
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+
+    function safeJsonParse(s) {
+        try { return JSON.parse(s); } catch (e) { return null; }
+    }
+
+    try {
+        var body = request.body;
+        var requestData;
+
+        
+        if (typeof body === 'string') {
+            requestData = JSON.parse(body);
+        } else if (body.data) {
+            requestData = body.data;
+        } else {
+            requestData = body;
+        }
+
+        
+        gs.info('=== Salesforce Create Record Request ===');
+        gs.info('Full payload: ' + JSON.stringify(requestData, null, 2));
+        gs.info('Object Name: ' + (requestData.objectName || requestData.sObjectName || 'NOT PROVIDED'));
+        gs.info('Fields: ' + JSON.stringify(requestData.fields || {}, null, 2));
+        gs.info('========================================');
+
+        
+        if (!requestData) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Request body is required'
+            }));
+            return;
+        }
+
+        var objectName = requestData.objectName || requestData.sObjectName;
+        if (!objectName) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Missing required field: objectName or sObjectName'
+            }));
+            return;
+        }
+
+        var fields = requestData.fields || {};
+        if (!fields || Object.keys(fields).length === 0) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Missing required field: fields (at least one field must be provided)'
+            }));
+            return;
+        }
+
+        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const lookup = connectionService.getCurrentUserConnection();
+        if (!lookup || !lookup.success) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: (lookup && lookup.error) ? lookup.error : 'No active connection found'
+            }));
+            return;
+        }
+
+        const details = connectionService.getConnectionDetails(lookup.connection_id);
+        if (!details || !details.success || !details.connection) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: (details && details.error) ? details.error : 'Connection details not found'
+            }));
+            return;
+        }
+
+        const connection = details.connection;
+        if (!connection.instance_url) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Salesforce instance_url is missing on the connection'
+            }));
+            return;
+        }
+
+        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const accessToken = oauthService.ensureValidAccessToken({
+            connection: connection,
+            connectionService: connectionService
+        });
+
+        if (!accessToken) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Unable to obtain Salesforce access token (re-authorize the connection)'
+            }));
+            return;
+        }
+
+        var instanceUrl = connection.instance_url.replace(/\/+$/, '');
+
+        var describeReq = new sn_ws.RESTMessageV2();
+        describeReq.setEndpoint(instanceUrl + '/services/data/v56.0/sobjects/' + objectName + '/describe');
+        describeReq.setHttpMethod('GET');
+        describeReq.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        describeReq.setRequestHeader('Accept', 'application/json');
+        
+        var describeRes = describeReq.execute();
+        var referenceFields = {};
+        var invalidReferenceFields = [];
+        
+        if (describeRes.getStatusCode() === 200) {
+            var describeData = safeJsonParse(describeRes.getBody());
+            if (describeData && describeData.fields) {
+                
+                for (var f = 0; f < describeData.fields.length; f++) {
+                    var field = describeData.fields[f];
+                    if (field.type === 'reference') {
+                        referenceFields[field.name] = true;
+                    }
+                }
+            }
+        }
+
+        
+        
+        function isValidSalesforceId(value) {
+            if (!value || typeof value !== 'string') {
+                return false;
+            }
+            
+            value = value.trim();
+            
+            var idPattern = /^[a-zA-Z0-9]{15}$|^[a-zA-Z0-9]{18}$/;
+            return idPattern.test(value);
+        }
+
+        var validatedFields = {};
+        
+        for (var fieldName in fields) {
+            var fieldValue = fields[fieldName];
+            
+            
+            if (referenceFields[fieldName]) {
+                if (fieldValue && fieldValue !== '') {
+                    if (!isValidSalesforceId(fieldValue)) {
+                        invalidReferenceFields.push({
+                            field: fieldName,
+                            value: fieldValue,
+                            message: 'Invalid Salesforce ID format. IDs must be 15 or 18 alphanumeric characters.'
+                        });
+                        continue;
+                    }
+                }
+            }
+            
+            validatedFields[fieldName] = fieldValue;
+        }
+
+        if (invalidReferenceFields.length > 0) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Invalid reference field values',
+                invalidFields: invalidReferenceFields
+            }));
+            return;
+        }
+
+        var endpoint = instanceUrl + '/services/data/v56.0/sobjects/' + objectName + '/';
+        var restMessage = new sn_ws.RESTMessageV2();
+        restMessage.setEndpoint(endpoint);
+        restMessage.setHttpMethod('POST');
+        restMessage.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        restMessage.setRequestHeader('Content-Type', 'application/json');
+        restMessage.setRequestHeader('Accept', 'application/json');
+        
+        
+        restMessage.setRequestBody(JSON.stringify(validatedFields));
+
+        if (invalidReferenceFields.length > 0) {
+            gs.warn('Invalid reference fields filtered out: ' + JSON.stringify(invalidReferenceFields, null, 2));
+        }
+
+        var restResponse = restMessage.execute();
+        var httpStatus = restResponse.getStatusCode();
+        var responseBody = restResponse.getBody();
+
+        if (httpStatus >= 200 && httpStatus < 300) {
+            var sfData = safeJsonParse(responseBody);
+            if (!sfData) {
+                response.setStatus(500);
+                writer.writeString(JSON.stringify({
+                    success: false,
+                    error: 'Failed to parse Salesforce response'
+                }));
+                return;
+            }
+
+            response.setStatus(201);
+            writer.writeString(JSON.stringify({
+                success: true,
+                id: sfData.id || null,
+                message: 'Record created successfully',
+                data: sfData
+            }));
+        } else {
+            var errorData = safeJsonParse(responseBody);
+            var errorMessage = 'Failed to create record in Salesforce';
+            if (errorData && errorData.length > 0 && errorData[0].message) {
+                errorMessage = errorData[0].message;
+            } else if (errorData && errorData.message) {
+                errorMessage = errorData.message;
+            } else if (typeof errorData === 'string') {
+                errorMessage = errorData;
+            }
+
+            response.setStatus(httpStatus);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: errorMessage,
+                details: errorData
+            }));
+        }
+         
+   
+
+    } catch (err) {
+        gs.error('Error in salesforce-create-record: ' + err.message + '\nStack: ' + err.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + err.message
+        }));
+    }
+})(request, response);

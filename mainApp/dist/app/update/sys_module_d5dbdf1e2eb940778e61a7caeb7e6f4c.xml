@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<record_update table="sys_module">
+  <sys_module action="INSERT_OR_UPDATE">
+    <sys_id>d5dbdf1e2eb940778e61a7caeb7e6f4c</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_module_d5dbdf1e2eb940778e61a7caeb7e6f4c</sys_update_name>
+    <content><![CDATA[(function process(request, response) {
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+
+    try {
+        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const currentConnection = connectionService.getCurrentUserConnection();
+        if (!currentConnection.success) {
+            response.setStatus(404);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: currentConnection.error || 'No active connection found'
+            }));
+            return;
+        }
+
+        const connectionResult = connectionService.getConnectionById(currentConnection.connection_id);
+        if (!connectionResult.success) {
+            response.setStatus(404);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: connectionResult.error || 'Connection details not found'
+            }));
+            return;
+        }
+
+        const connection = connectionResult.connection || {};
+
+        response.setStatus(200);
+        writer.writeString(JSON.stringify({
+            success: true,
+            result: {
+                instanceUrl: connection.instance_url || ''
+            }
+        }));
+    } catch (error) {
+        gs.error('Error in Salesforce connection GET handler: ' + error.message + '\nStack: ' + error.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + error.message
+        }));
+    }
+})(request, response);
+
+
+]]></content>
+    <external_source>false</external_source>
+    <path>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/connection-get.js</path>
+    <sys_name>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/connection-get.js</sys_name>
+  </sys_module>
+</record_update>

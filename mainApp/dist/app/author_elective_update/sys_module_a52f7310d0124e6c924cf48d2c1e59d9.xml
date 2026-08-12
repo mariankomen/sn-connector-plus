@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<record_update table="sys_module">
+  <sys_module action="DELETE">
+    <sys_id>a52f7310d0124e6c924cf48d2c1e59d9</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_module_a52f7310d0124e6c924cf48d2c1e59d9</sys_update_name>
+  </sys_module>
+</record_update>

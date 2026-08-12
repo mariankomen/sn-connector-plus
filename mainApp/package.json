@@ -1,0 +1,31 @@
+{
+  "name": "peeklogicconnector",
+  "version": "0.0.1",
+  "description": "",
+  "license": "UNLICENSED",
+  "imports": {
+    "#now:*": "./@types/servicenow/fluent/*/index.js"
+  },
+  "scripts": {
+    "build": "now-sdk build",
+    "deploy": "now-sdk install",
+    "transform": "now-sdk transform",
+    "types": "now-sdk dependencies",
+    "embed-bundle": "node embed-bundle.js"
+  },
+  "devDependencies": {
+    "@servicenow/eslint-plugin-sdk-app-plugin": "4.4.0",
+    "@servicenow/glide": "27.0.4",
+    "@servicenow/sdk": "4.4.0",
+    "@types/react": "19.x",
+    "@types/react-dom": "19.x",
+    "eslint": "8.50.0",
+    "react": "19.x",
+    "react-dom": "19.x",
+    "typescript": "5.5.4",
+    "axios": "^1.15.2"
+  },
+  "dependencies": {
+    "axios": "^1.15.2"
+  }
+}

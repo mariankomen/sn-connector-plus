@@ -1,0 +1,38 @@
+.connection-info {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.connection-info h3 {
+    color: #155724;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.btn-disconnect {
+    margin-top: 20px;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    color: #6c757d;
+    font-size: 12px;
+}
+
+@media (max-width: 768px) {
+    .connection-info {
+        padding: 16px;
+    }
+
+    .btn-disconnect {
+        width: 100%;
+    }
+
+    .form-group small {
+        font-size: 13px;
+    }
+}

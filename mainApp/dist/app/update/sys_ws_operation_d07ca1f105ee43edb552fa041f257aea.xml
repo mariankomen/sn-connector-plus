@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<record_update table="sys_ws_operation">
+  <sys_ws_operation action="INSERT_OR_UPDATE">
+    <sys_id>d07ca1f105ee43edb552fa041f257aea</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_ws_operation_d07ca1f105ee43edb552fa041f257aea</sys_update_name>
+    <active>true</active>
+    <consumes>application/json,application/xml,text/xml</consumes>
+    <consumes_customized>false</consumes_customized>
+    <default_operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/task-type-config</default_operation_uri>
+    <enforce_acl>064a8e03949c49f88bb8321ee55fd0bb</enforce_acl>
+    <http_method>PUT</http_method>
+    <name>/task-type-config</name>
+    <operation_script><![CDATA[(function process(request, response) {
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+    
+    try {
+        const connectionHelper = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const activeConnection = connectionHelper.getCurrentUserConnection();
+        if (!activeConnection.success) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'No active connection found. Please connect to Salesforce first.'
+            }));
+            return;
+        }
+        
+        const connectionId = activeConnection.connection_id;
+        const body = request.body ? request.body.data : {};
+        const taskTypesToSave = body.task_types || [];
+        
+        if (!Array.isArray(taskTypesToSave)) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'task_types must be an array'
+            }));
+            return;
+        }
+        
+        const deleteGr = new GlideRecord('x_peekl_salesfor_0_task_type_config');
+        deleteGr.addQuery('connection_id', connectionId);
+        deleteGr.deleteMultiple();
+        
+        const results = [];
+        const errors = [];
+        
+        for (let i = 0; i < taskTypesToSave.length; i++) {
+            const taskType = taskTypesToSave[i];
+            
+            if (!taskType.table_name || !taskType.table_label) {
+                errors.push('Task type at index ' + i + ' is missing required fields (table_name, table_label)');
+                continue;
+            }
+            
+            try {
+                const newGr = new GlideRecord('x_peekl_salesfor_0_task_type_config');
+                newGr.initialize();
+                newGr.setValue('connection_id', connectionId);
+                newGr.setValue('table_name', taskType.table_name);
+                newGr.setValue('table_label', taskType.table_label);
+                newGr.setValue('created_by', gs.getUserID());
+                const sysId = newGr.insert();
+                
+                results.push({
+                    sys_id: sysId,
+                    table_name: taskType.table_name,
+                    table_label: taskType.table_label
+                });
+            } catch (error) {
+                errors.push('Error saving ' + taskType.table_name + ': ' + error.message);
+            }
+        }
+        
+        if (errors.length > 0) {
+            response.setStatus(207);
+            writer.writeString(JSON.stringify({
+                success: false,
+                results: results,
+                errors: errors,
+                message: 'Some task types could not be saved'
+            }));
+        } else {
+            response.setStatus(200);
+            writer.writeString(JSON.stringify({
+                success: true,
+                results: results,
+                message: 'Task type configuration saved successfully'
+            }));
+        }
+        
+    } catch (error) {
+        gs.error('Error in task type config PUT handler: ' + error.message + '\nStack: ' + error.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + error.message
+        }));
+    }
+    
+})(request, response);
+]]></operation_script>
+    <operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/task-type-config</operation_uri>
+    <produces>application/json,application/xml,text/xml</produces>
+    <produces_customized>false</produces_customized>
+    <relative_path>/task-type-config</relative_path>
+    <request_example/>
+    <requires_acl_authorization>true</requires_acl_authorization>
+    <requires_authentication>true</requires_authentication>
+    <requires_snc_internal_role>true</requires_snc_internal_role>
+    <short_description>Upsert task type configuration - updates existing or creates new</short_description>
+    <sys_policy/>
+    <web_service_definition>25cee077e5594db7b73b41a697f46061</web_service_definition>
+    <web_service_version/>
+  </sys_ws_operation>
+</record_update>

@@ -1,0 +1,38 @@
+(function executeRule(current, previous) {
+    var sysId = current.sys_id ? current.sys_id.toString() : current.getUniqueValue();
+    if (!sysId) {
+        gs.error('Task sync delete BR: unable to determine sys_id');
+        return;
+    }
+
+    var connectionId = '';
+    try {
+        var connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        var connectionLookup = connectionService.getCurrentUserConnection();
+        if (connectionLookup && connectionLookup.success) {
+            connectionId = connectionLookup.connection_id;
+        } else {
+            throw new Error('Could not find connection');
+        }
+    } catch (err) {
+        gs.error('Task sync delete BR: connection lookup failed - ' + err.message);
+        return;
+    }
+
+    var taskSyncService = new x_peekl_salesfor_0.TaskSyncService();
+    if (!taskSyncService.isSyncEnabled(connectionId, current.getTableName())) {
+        return;
+    }
+
+    var payload = {
+        eventType: 'delete',
+        table: current.getTableName(),
+        connectionId: connectionId,
+        record: {
+            sys_id: sysId
+        }
+    };
+
+    var queueService = new x_peekl_salesfor_0.SyncEventQueueService();
+    queueService.enqueuePayload(payload);
+})(current, previous);

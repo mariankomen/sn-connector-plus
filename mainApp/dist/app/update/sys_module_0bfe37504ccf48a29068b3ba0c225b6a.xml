@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<record_update>
+  <sys_module action="INSERT_OR_UPDATE">
+    <sys_id>0bfe37504ccf48a29068b3ba0c225b6a</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <path>x_peekl_salesfor_0/peeklogicconnector/0.0.1/bom.json</path>
+    <external_source>false</external_source>
+    <content><![CDATA[{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "serialNumber": "urn:uuid:5b51471f-1395-4f94-b86d-9c1e335f546c",
+  "metadata": {
+    "timestamp": "2026-07-16T07:05:26.195Z",
+    "tools": {
+      "components": [
+        {
+          "type": "library",
+          "name": "sdk-build-plugins",
+          "group": "@servicenow",
+          "version": "4.4.0",
+          "author": "ServiceNow"
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "name": "peeklogicconnector",
+      "version": "0.0.1",
+      "bom-ref": "pkg:servicenow/peeklogicconnector@0.0.1?sys_scope_id=c0c895442faccb503ee3116e8ea4e308",
+      "licenses": [
+        {
+          "license": {
+            "name": "UNLICENSED"
+          }
+        }
+      ],
+      "purl": "pkg:servicenow/peeklogicconnector@0.0.1?sys_scope_id=c0c895442faccb503ee3116e8ea4e308"
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "pkg:servicenow/peeklogicconnector@0.0.1?sys_scope_id=c0c895442faccb503ee3116e8ea4e308"
+    }
+  ]
+}]]></content>
+  </sys_module>
+</record_update>

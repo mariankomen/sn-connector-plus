@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<database>
+  <element name="x_peekl_salesfor_0_sync_event_queue" type="collection" label="Sync Event Queue" is_extendable="false" text_index="false" read_only="false" audit="false" access="public" caller_access="1" ws_access="false" read_access="true" alter_access="false" create_access="true" update_access="true" delete_access="true" actions_access="false" client_scripts_access="false" scriptable_table="false" attributes="">
+    <element name="payload" type="string" active="true" array="false" audit="false" unique="false" label="Payload" max_length="4000" mandatory="true" read_only="false" choice="0" display="false" function_field="false" attributes="" spell_check="false" xml_view="false" table_reference="false" text_index="false" element_reference="false" primary="false"/>
+    <element name="status" type="string" active="true" array="false" audit="false" unique="false" label="Status" max_length="40" mandatory="true" read_only="false" choice="0" display="false" function_field="false" attributes="" spell_check="false" xml_view="false" table_reference="false" text_index="false" element_reference="false" primary="false"/>
+    <element name="retries" type="integer" active="true" array="false" audit="false" unique="false" label="Retries" max_length="40" mandatory="true" read_only="false" choice="0" display="false" function_field="false" attributes="" spell_check="false" xml_view="false" table_reference="false" text_index="false" element_reference="false" primary="false"/>
+    <element name="error_message" type="string" active="true" array="false" audit="false" unique="false" label="Error Message" max_length="1000" mandatory="false" read_only="false" choice="0" display="false" function_field="false" attributes="" spell_check="false" xml_view="false" table_reference="false" text_index="false" element_reference="false" primary="false"/>
+  </element>
+</database>

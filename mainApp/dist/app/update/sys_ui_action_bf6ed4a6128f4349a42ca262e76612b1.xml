@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<record_update table="sys_ui_action">
+  <sys_ui_action action="INSERT_OR_UPDATE">
+    <sys_id>bf6ed4a6128f4349a42ca262e76612b1</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_ui_action_bf6ed4a6128f4349a42ca262e76612b1</sys_update_name>
+    <action_name>salesforce_connector</action_name>
+    <active>true</active>
+    <client>true</client>
+    <client_script_v2/>
+    <comments/>
+    <condition/>
+    <form_button>true</form_button>
+    <form_button_v2>false</form_button_v2>
+    <form_context_menu>false</form_context_menu>
+    <form_link>false</form_link>
+    <form_menu_button_v2>false</form_menu_button_v2>
+    <form_style>unstyled</form_style>
+    <format_for_configurable_workspace>false</format_for_configurable_workspace>
+    <hint>Open the Salesforce Connector panel to link, search, or create related Salesforce records</hint>
+    <isolate_script>false</isolate_script>
+    <list_banner_button>false</list_banner_button>
+    <list_button>false</list_button>
+    <list_choice>false</list_choice>
+    <list_context_menu>false</list_context_menu>
+    <list_link>false</list_link>
+    <list_save_with_form_button>false</list_save_with_form_button>
+    <list_style/>
+    <messages/>
+    <name>Salesforce Connector</name>
+    <onclick>openReactModal()</onclick>
+    <order>100</order>
+    <overrides/>
+    <script><![CDATA[function openReactModal() {
+    if (g_form.isNewRecord()) return false;
+    var m = new GlideModal('x_peekl_salesfor_0_ServiceNowPage');
+    m.setTitle('Peeklogic Connector Plus');
+    m.setWidth(1200);
+    m.setPreference('sysparm_sys_id', g_form.getUniqueValue());
+    m.setPreference('sysparm_table', g_form.getTableName());
+    m.render();
+    return false;
+}]]></script>
+    <show_insert>false</show_insert>
+    <show_multiple_update>false</show_multiple_update>
+    <show_query>false</show_query>
+    <show_update>true</show_update>
+    <table>task</table>
+    <ui11_compatible>true</ui11_compatible>
+    <ui16_compatible>true</ui16_compatible>
+  </sys_ui_action>
+</record_update>

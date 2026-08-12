@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<record_update table="sys_security_acl_role">
+  <sys_security_acl_role action="DELETE">
+    <sys_id>37a84860db6e429da92cfc2cb0404ff3</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_security_acl_role_37a84860db6e429da92cfc2cb0404ff3</sys_update_name>
+    <sys_security_acl>3b0cfcf75c1b4f74962b44055e035577</sys_security_acl>
+    <sys_user_role name="salesforce_integration_user_paid">c9de5d060283426c8a71d9d77e8a615d</sys_user_role>
+  </sys_security_acl_role>
+</record_update>

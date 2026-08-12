@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+<record_update table="sys_ws_operation">
+  <sys_ws_operation action="INSERT_OR_UPDATE">
+    <sys_id>37f8ac10fc4d4b4a93014f2384f31a45</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_ws_operation_37f8ac10fc4d4b4a93014f2384f31a45</sys_update_name>
+    <active>true</active>
+    <consumes>application/json,application/xml,text/xml</consumes>
+    <consumes_customized>false</consumes_customized>
+    <default_operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/record-types</default_operation_uri>
+    <enforce_acl>064a8e03949c49f88bb8321ee55fd0bb</enforce_acl>
+    <http_method>GET</http_method>
+    <name>/salesforce/record-types</name>
+    <operation_script><![CDATA[(function process(request, response) {
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+
+    function safeJsonParse(s) {
+        try { return JSON.parse(s); } catch (e) { return null; }
+    }
+
+    function getParam(name) {
+        try {
+            if (request && request.queryParams) {
+                if (request.queryParams[name] !== undefined && request.queryParams[name] !== null && request.queryParams[name] !== '') {
+                    return '' + request.queryParams[name];
+                }
+            }
+            if (request && typeof request.getParameter === 'function') {
+                const v2 = request.getParameter(name);
+                if (v2 !== null && v2 !== undefined && v2 !== '') return '' + v2;
+            }
+        } catch (e) { }
+        return null;
+    }
+
+    try {
+        const objectName = getParam('object_name') || getParam('objectName');
+        
+        if (!objectName) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Missing required parameter: object_name'
+            }));
+            return;
+        }
+
+        
+        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const lookup = connectionService.getCurrentUserConnection();
+        if (!lookup || !lookup.success) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: (lookup && lookup.error) ? lookup.error : 'No active connection found'
+            }));
+            return;
+        }
+
+        
+        const details = connectionService.getConnectionDetails(lookup.connection_id);
+        if (!details || !details.success || !details.connection) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: (details && details.error) ? details.error : 'Connection details not found'
+            }));
+            return;
+        }
+
+        const connection = details.connection;
+        if (!connection.instance_url) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Salesforce instance_url is missing on the connection'
+            }));
+            return;
+        }
+
+        
+        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const accessToken = oauthService.ensureValidAccessToken({
+            connection: connection,
+            connectionService: connectionService
+        });
+        
+        if (!accessToken) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Unable to obtain Salesforce access token (re-authorize the connection)'
+            }));
+            return;
+        }
+
+        var instanceUrl = connection.instance_url.replace(/\/+$/, '');
+
+        var endpoint = instanceUrl + '/services/data/v56.0/sobjects/' + objectName + '/describe';
+        var restMessage = new sn_ws.RESTMessageV2();
+        restMessage.setEndpoint(endpoint);
+        restMessage.setHttpMethod('GET');
+        restMessage.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        restMessage.setRequestHeader('Accept', 'application/json');
+
+        var restResponse = restMessage.execute();
+        var httpStatus = restResponse.getStatusCode();
+        var responseBody = restResponse.getBody();
+
+        if (httpStatus >= 200 && httpStatus < 300) {
+            var describeData = safeJsonParse(responseBody);
+            
+            if (!describeData) {
+                response.setStatus(500);
+                writer.writeString(JSON.stringify({
+                    success: false,
+                    error: 'Failed to parse Salesforce response'
+                }));
+                return;
+            }
+
+            
+            var recordTypes = [];
+            if (describeData.recordTypeInfos && Array.isArray(describeData.recordTypeInfos)) {
+                for (var i = 0; i < describeData.recordTypeInfos.length; i++) {
+                    var recordType = describeData.recordTypeInfos[i];
+                    
+                    recordTypes.push({
+                        name: recordType.name,
+                        recordTypeId: recordType.master ? 'Master' : recordType.recordTypeId,
+                        master: recordType.master || false,
+                        defaultRecordTypeMapping: recordType.defaultRecordTypeMapping || false,
+                        active: recordType.active !== false
+                    });
+                }
+            }
+
+            response.setStatus(200);
+            writer.writeString(JSON.stringify({
+                success: true,
+                objectName: objectName,
+                objectLabel: describeData.label || objectName,
+                recordTypes: recordTypes,
+                hasRecordTypes: recordTypes.length > 0
+            }));
+
+        } else {
+            var errorData = safeJsonParse(responseBody);
+            if (!errorData) {
+                errorData = { error: responseBody };
+            }
+
+            gs.error('Salesforce describe failed. Status=' + httpStatus + ' Body=' + responseBody);
+            response.setStatus(httpStatus);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: errorData.message || errorData[0]?.message || errorData.error || 'Salesforce API error',
+                details: errorData
+            }));
+        }
+
+    } catch (err) {
+        gs.error('Error in Salesforce record types handler: ' + err.message + '\nStack: ' + err.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + (err.message || String(err))
+        }));
+    }
+})(request, response);
+]]></operation_script>
+    <operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/record-types</operation_uri>
+    <produces>application/json,application/xml,text/xml</produces>
+    <produces_customized>false</produces_customized>
+    <relative_path>/salesforce/record-types</relative_path>
+    <request_example/>
+    <requires_acl_authorization>true</requires_acl_authorization>
+    <requires_authentication>true</requires_authentication>
+    <requires_snc_internal_role>true</requires_snc_internal_role>
+    <short_description>Fetch the record types for a Salesforce object</short_description>
+    <sys_policy/>
+    <web_service_definition>25cee077e5594db7b73b41a697f46061</web_service_definition>
+    <web_service_version/>
+  </sys_ws_operation>
+</record_update>

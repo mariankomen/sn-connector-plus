@@ -1,0 +1,88 @@
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.settings-description {
+    color: #6c757d;
+}
+
+.settings-section {
+    margin-bottom: 30px;
+}
+
+.settings-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.selected-task-types-container {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+.task-types-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+}
+
+.task-type-chip {
+    display: flex;
+    align-items: center;
+    background: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 20px;
+    padding: 8px 12px;
+    font-size: 14px;
+    width: fit-content;
+}
+
+.task-type-label {
+    margin-right: 8px;
+}
+
+.task-type-name {
+    color: #6c757d;
+    margin-left: 5px;
+}
+
+@media (max-width: 768px) {
+    .settings-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .settings-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .settings-section-header .btn {
+        width: 100%;
+    }
+
+    .selected-task-types-container {
+        padding: 16px;
+    }
+
+    .task-types-list {
+        flex-direction: column;
+    }
+
+    .task-type-chip {
+        width: 100%;
+        justify-content: space-between;
+        box-sizing: border-box;
+    }
+}
+

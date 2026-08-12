@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<record_update table="sys_ws_operation">
+  <sys_ws_operation action="INSERT_OR_UPDATE">
+    <sys_id>691e96bd65a343cfbdb41a3ea919167f</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_ws_operation_691e96bd65a343cfbdb41a3ea919167f</sys_update_name>
+    <active>true</active>
+    <consumes>application/json,application/xml,text/xml</consumes>
+    <consumes_customized>false</consumes_customized>
+    <default_operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/task-type-config</default_operation_uri>
+    <enforce_acl>064a8e03949c49f88bb8321ee55fd0bb</enforce_acl>
+    <http_method>GET</http_method>
+    <name>/task-type-config</name>
+    <operation_script><![CDATA[(function process(request, response) {
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+    
+    try {
+        const connectionHelper = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const activeConnection = connectionHelper.getCurrentUserConnection();
+        if (!activeConnection.success) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'No active connection found. Please connect to Salesforce first.'
+            }));
+            return;
+        }
+        
+        const connectionId = activeConnection.connection_id;
+        
+        const configGr = new GlideRecord('x_peekl_salesfor_0_task_type_config');
+        configGr.addQuery('connection_id', connectionId);
+        configGr.orderBy('table_name');
+        configGr.query();
+        
+        const taskTypes = [];
+        while (configGr.next()) {
+            taskTypes.push({
+                sys_id: configGr.getUniqueValue(),
+                table_name: configGr.getValue('table_name'),
+                table_label: configGr.getValue('table_label'),
+                created_on: configGr.getValue('sys_created_on')
+            });
+        }
+        
+        response.setStatus(200);
+        writer.writeString(JSON.stringify({
+            success: true,
+            result: {
+                task_types: taskTypes,
+                connection_id: connectionId
+            }
+        }));
+        
+    } catch (error) {
+        gs.error('Error in task type config GET handler: ' + error.message + '\nStack: ' + error.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + error.message
+        }));
+    }
+    
+})(request, response);
+]]></operation_script>
+    <operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/task-type-config</operation_uri>
+    <produces>application/json,application/xml,text/xml</produces>
+    <produces_customized>false</produces_customized>
+    <relative_path>/task-type-config</relative_path>
+    <request_example/>
+    <requires_acl_authorization>true</requires_acl_authorization>
+    <requires_authentication>true</requires_authentication>
+    <requires_snc_internal_role>true</requires_snc_internal_role>
+    <short_description>Get current task type configuration for connection</short_description>
+    <sys_policy/>
+    <web_service_definition>25cee077e5594db7b73b41a697f46061</web_service_definition>
+    <web_service_version/>
+  </sys_ws_operation>
+</record_update>

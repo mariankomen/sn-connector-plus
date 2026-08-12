@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<record_update table="sys_module">
+  <sys_module action="INSERT_OR_UPDATE">
+    <sys_id>d47f2401e5804178bd172b4afbd9d26c</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_module_d47f2401e5804178bd172b4afbd9d26c</sys_update_name>
+    <content><![CDATA[(function process(request, response) {
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+
+    function safeJsonParse(s) {
+        try { return JSON.parse(s); } catch (e) { return null; }
+    }
+
+    function getParam(name) {
+        try {
+            if (request && request.queryParams) {
+                if (request.queryParams[name] !== undefined && request.queryParams[name] !== null && request.queryParams[name] !== '') {
+                    return '' + request.queryParams[name];
+                }
+            }
+            if (request && typeof request.getParameter === 'function') {
+                const v2 = request.getParameter(name);
+                if (v2 !== null && v2 !== undefined && v2 !== '') return '' + v2;
+            }
+        } catch (e) { }
+        return null;
+    }
+
+    try {
+        const objectName = getParam('object_name') || getParam('sobject_name') || getParam('object');
+        
+        if (!objectName) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Missing required parameter: object_name (or sobject_name or object)'
+            }));
+            return;
+        }
+
+        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const lookup = connectionService.getCurrentUserConnection();
+        if (!lookup || !lookup.success) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: (lookup && lookup.error) ? lookup.error : 'No active connection found'
+            }));
+            return;
+        }
+
+        const details = connectionService.getConnectionDetails(lookup.connection_id);
+        if (!details || !details.success || !details.connection) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: (details && details.error) ? details.error : 'Connection details not found'
+            }));
+            return;
+        }
+
+        const connection = details.connection;
+        if (!connection.instance_url) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Salesforce instance_url is missing on the connection'
+            }));
+            return;
+        }
+
+        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const accessToken = oauthService.ensureValidAccessToken({
+            connection: connection,
+            connectionService: connectionService
+        });
+        if (!accessToken) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Unable to obtain Salesforce access token (re-authorize the connection)'
+            }));
+            return;
+        }
+
+        const endpoint = connection.instance_url.replace(/\/+$/, '') + 
+            '/services/data/v56.0/sobjects/' + objectName + '/describe';
+
+        const req = new sn_ws.RESTMessageV2();
+        req.setEndpoint(endpoint);
+        req.setHttpMethod('GET');
+        req.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        req.setRequestHeader('Accept', 'application/json');
+
+        const res = req.execute();
+        const status = res.getStatusCode();
+        const body = res.getBody() || '';
+        const parsed = safeJsonParse(body);
+
+        if (status < 200 || status >= 300) {
+            gs.error('Salesforce describe API failed for object: ' + objectName + ' Status=' + status + ' Body=' + body.substring(0, 500));
+            response.setStatus(status);
+            writer.writeString(JSON.stringify({
+                success: false,
+                status: status,
+                error: 'Salesforce describe API request failed',
+                object_name: objectName,
+                salesforce: parsed || body
+            }));
+            return;
+        }
+
+        var fields = [];
+        if (parsed && parsed.fields && Array.isArray(parsed.fields)) {
+            for (var i = 0; i < parsed.fields.length; i++) {
+                var field = parsed.fields[i];
+                
+                if (field.deprecated === false || field.deprecated === undefined) {
+                    fields.push({
+                        name: field.name,
+                        label: field.label,
+                        type: field.type,
+                        length: field.length || null,
+                        required: field.nillable === false,
+                        updateable: field.updateable || false,
+                        createable: field.createable || false,
+                        sortable: field.sortable || false,
+                        filterable: field.filterable || false,
+                        searchable: field.searchable || false,
+                        nameField: field.nameField || false,
+                        custom: field.custom || false,
+                        calculated: field.calculated || false,
+                        referenceTo: field.referenceTo || [],
+                        relationshipName: field.relationshipName || null,
+                        helpText: field.inlineHelpText || null
+                    });
+                }
+            }
+        }
+
+        fields.sort(function(a, b) {
+            return (a.label || a.name).localeCompare(b.label || b.name);
+        });
+
+        response.setStatus(200);
+        writer.writeString(JSON.stringify({
+            success: true,
+            status: status,
+            object_name: objectName,
+            object_label: parsed && parsed.label ? parsed.label : objectName,
+            total_fields: fields.length,
+            fields: fields,
+            metadata: {
+                name: parsed && parsed.name ? parsed.name : objectName,
+                label: parsed && parsed.label ? parsed.label : objectName,
+                keyPrefix: parsed && parsed.keyPrefix ? parsed.keyPrefix : null,
+                nameField: parsed && parsed.nameField ? parsed.nameField : null
+            }
+        }));
+
+    } catch (error) {
+        gs.error('Error in Salesforce object columns GET handler: ' + error.message + '\nStack: ' + error.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + error.message
+        }));
+    }
+})(request, response);
+
+]]></content>
+    <external_source>false</external_source>
+    <path>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/salesforce-object-get-columns.js</path>
+    <sys_name>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/salesforce-object-get-columns.js</sys_name>
+  </sys_module>
+</record_update>

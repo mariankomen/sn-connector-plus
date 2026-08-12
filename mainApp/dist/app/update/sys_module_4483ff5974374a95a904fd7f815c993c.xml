@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+<record_update table="sys_module">
+  <sys_module action="INSERT_OR_UPDATE">
+    <sys_id>4483ff5974374a95a904fd7f815c993c</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_module_4483ff5974374a95a904fd7f815c993c</sys_update_name>
+    <content><![CDATA[(function process(request, response) {
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+
+    function safeJsonParse(s) {
+        try {
+            return JSON.parse(s);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function getParam(name) {
+        try {
+            if (request && request.queryParams) {
+                if (
+                    request.queryParams[name] !== undefined &&
+                    request.queryParams[name] !== null &&
+                    request.queryParams[name] !== ''
+                ) {
+                    return '' + request.queryParams[name];
+                }
+            }
+            if (request && typeof request.getParameter === 'function') {
+                const v2 = request.getParameter(name);
+                if (v2 !== null && v2 !== undefined && v2 !== '') return '' + v2;
+            }
+        } catch (e) {}
+        return null;
+    }
+
+    function write(status, obj) {
+        response.setStatus(status);
+        writer.writeString(JSON.stringify(obj));
+    }
+
+    function isSalesforceId(id) {
+        return /^[a-zA-Z0-9]{15}$|^[a-zA-Z0-9]{18}$/.test(id);
+    }
+
+    function addViewUrlsToIdFields(recordData, instanceUrl) {
+        if (!recordData || typeof recordData !== 'object') {
+            return recordData;
+        }
+
+        let fieldsToCheck = recordData;
+        if (recordData.fields && typeof recordData.fields === 'object') {
+            fieldsToCheck = recordData.fields;
+        }
+
+        const result = JSON.parse(JSON.stringify(recordData));
+
+        const fieldsToModify = recordData.fields ? result.fields : result;
+
+        for (const fieldName in fieldsToCheck) {
+            if (fieldName === 'attributes' || fieldName === 'Id' || fieldName === 'id') {
+                continue;
+            }
+
+            const fieldValue = fieldsToCheck[fieldName];
+            
+            if (!fieldValue || typeof fieldValue !== 'string') {
+                continue;
+            }
+
+            const isIdField = (fieldName.endsWith('Id') || fieldName.endsWith('__c')) && 
+                             isSalesforceId(fieldValue);
+            
+            if (isIdField) {
+                
+                const viewUrl = instanceUrl + '/' + fieldValue;
+                fieldsToModify[fieldName + '_url'] = viewUrl;
+            }
+        }
+
+        return result;
+    }
+
+    try {
+        let requestData = {};
+        if (request.method === 'POST' && request.body) {
+            const body = request.body;
+            if (typeof body === 'string') requestData = safeJsonParse(body) || {};
+            else if (body.data) requestData = body.data;
+            else requestData = body;
+        }
+
+        const recordId =
+            requestData.sf_record_id || requestData.recordId || 
+            getParam('sf_record_id') || getParam('record_id') || getParam('recordId');
+        
+        const objectType =
+            requestData.sf_object_type || requestData.objectType ||
+            getParam('sf_object_type') || getParam('object_type') || getParam('objectType');
+
+        if (!recordId) {
+            return write(400, { success: false, error: 'Missing required parameter: sf_record_id or recordId' });
+        }
+
+        if (!objectType) {
+            return write(400, { success: false, error: 'Missing required parameter: sf_object_type' });
+        }
+
+        if (!isSalesforceId(recordId)) {
+            return write(400, {
+                success: false,
+                error: 'Invalid recordId format. Salesforce IDs must be 15 or 18 alphanumeric characters.',
+            });
+        }
+
+        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const lookup = connectionService.getCurrentUserConnection();
+
+        if (!lookup || !lookup.success) {
+            return write(401, {
+                success: false,
+                error: (lookup && lookup.error) ? lookup.error : 'No active connection found',
+            });
+        }
+
+        const details = connectionService.getConnectionDetails(lookup.connection_id);
+        if (!details || !details.success || !details.connection) {
+            return write(401, {
+                success: false,
+                error: (details && details.error) ? details.error : 'Connection details not found',
+            });
+        }
+
+        const connection = details.connection;
+        if (!connection.instance_url) {
+            return write(400, { success: false, error: 'Salesforce instance_url is missing on the connection' });
+        }
+
+        
+        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const accessToken = oauthService.ensureValidAccessToken({
+            connection: connection,
+            connectionService: connectionService,
+        });
+
+        if (!accessToken) {
+            return write(401, {
+                success: false,
+                error: 'Unable to obtain Salesforce access token (re-authorize the connection)',
+            });
+        }
+
+        const instanceUrl = (connection.instance_url || '').replace(/\/+$/, '');
+
+        const endpoint = instanceUrl + '/services/data/v58.0/sobjects/' + objectType + '/' + recordId;
+
+        gs.info('[Peeklo] Fetching Salesforce record: ' + endpoint);
+
+        const rm = new sn_ws.RESTMessageV2();
+        rm.setEndpoint(endpoint);
+        rm.setHttpMethod('GET');
+        rm.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        rm.setRequestHeader('Accept', 'application/json');
+
+        const rr = rm.execute();
+        const httpStatus = rr.getStatusCode();
+        const responseBody = rr.getBody();
+        const parsed = safeJsonParse(responseBody);
+
+        gs.info('[Peeklo] Salesforce status: ' + httpStatus);
+
+        if (httpStatus >= 200 && httpStatus < 300) {
+            const recordData = parsed !== null ? parsed : safeJsonParse(responseBody);
+            const dataWithUrls = addViewUrlsToIdFields(recordData, instanceUrl);
+            
+            return write(200, {
+                success: true,
+                recordId: recordId,
+                objectType: objectType,
+                data: dataWithUrls,
+            });
+        }
+
+        
+        let errorMessage = 'Failed to fetch record from Salesforce';
+        if (parsed) {
+            if (Array.isArray(parsed) && parsed[0] && (parsed[0].message || parsed[0].error)) {
+                errorMessage = parsed[0].message || parsed[0].error;
+            } else if (parsed.message) {
+                errorMessage = parsed.message;
+            } else if (parsed.error) {
+                errorMessage = parsed.error;
+            } else if (parsed[0] && parsed[0].errorCode) {
+                
+                errorMessage = parsed[0].message || parsed[0].errorCode;
+            }
+        } else if (responseBody) {
+            errorMessage = responseBody.substring(0, 500);
+        }
+
+        gs.error('[Peeklo] Salesforce error ' + httpStatus + ': ' + errorMessage);
+
+        return write(httpStatus, {
+            success: false,
+            error: errorMessage,
+            httpStatus: httpStatus,
+            objectType: objectType,
+            details: parsed !== null ? parsed : responseBody,
+        });
+    } catch (err) {
+        gs.error('[Peeklo] Handler error: ' + err.message + '\nStack: ' + err.stack);
+        return write(500, { success: false, error: 'Internal server error: ' + err.message });
+    }
+})(request, response);
+]]></content>
+    <external_source>false</external_source>
+    <path>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/salesforce-object-detail.js</path>
+    <sys_name>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/salesforce-object-detail.js</sys_name>
+  </sys_module>
+</record_update>

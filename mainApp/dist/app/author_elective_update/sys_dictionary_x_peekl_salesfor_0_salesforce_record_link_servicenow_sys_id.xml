@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<record_update table="sys_dictionary">
+  <sys_dictionary action="DELETE" element="servicenow_sys_id" table="x_peekl_salesfor_0_salesforce_record_link">
+    <sys_id>5ac5669b3d014e19a213f6cdb3b00533</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_dictionary_x_peekl_salesfor_0_salesforce_record_link_servicenow_sys_id</sys_update_name>
+    <element>servicenow_sys_id</element>
+    <name>x_peekl_salesfor_0_salesforce_record_link</name>
+  </sys_dictionary>
+</record_update>

@@ -1,0 +1,257 @@
+<?xml version="1.0"?>
+<record_update table="sys_module">
+  <sys_module action="INSERT_OR_UPDATE">
+    <sys_id>db7d06de37f0456ea73691a67c07a2ee</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_module_db7d06de37f0456ea73691a67c07a2ee</sys_update_name>
+    <content><![CDATA[(function process(request, response) {
+    response.setContentType('application/json');
+    
+    try {
+        var body = request.body;
+        var data;
+        var isBatch = false;
+        
+        if (typeof body === 'string') {
+            body = JSON.parse(body);
+        }
+        
+        
+        if (Array.isArray(body)) {
+            data = body;
+            isBatch = true;
+        } else if (body.data && Array.isArray(body.data)) {
+            data = body.data;
+            isBatch = true;
+        } else if (body.data && typeof body.data === 'object') {
+            data = [body.data];
+        } else if (body.object_config && body.column_name) {
+            
+            data = [body];
+        } else {
+            data = [body];
+        }
+
+        if (!data || !Array.isArray(data)) {
+            response.setStatus(400);
+            response.setBody({
+                success: false,
+                error: 'No valid data provided'
+            });
+            return;
+        }
+        
+       
+        var objectConfigFromQuery = null;
+        try {
+            if (request && request.queryParams) {
+                var qp = request.queryParams;
+                if (qp.object_config !== undefined && qp.object_config !== null && qp.object_config !== '') {
+                    objectConfigFromQuery = '' + qp.object_config;
+                }
+            }
+            if ((objectConfigFromQuery === null || objectConfigFromQuery === '') && request && typeof request.getParameter === 'function') {
+                var ocq = request.getParameter('object_config');
+                if (ocq !== null && ocq !== undefined && ocq !== '') {
+                    objectConfigFromQuery = '' + ocq;
+                }
+            }
+        } catch (e) {
+        }
+        
+        
+        var columnsByObjectConfig = {};
+        
+        if (data.length === 0 && objectConfigFromQuery) {
+            columnsByObjectConfig[objectConfigFromQuery] = []; 
+        } else {
+            
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                if (!item || !item.object_config || !item.column_name) {
+                    response.setStatus(400);
+                    response.setBody({
+                        success: false,
+                        error: 'Missing required fields: object_config and column_name are required for all items'
+                    });
+                    return;
+                }
+            }
+
+            
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                var objConfigId = item.object_config;
+                if (!columnsByObjectConfig[objConfigId]) {
+                    columnsByObjectConfig[objConfigId] = [];
+                }
+                columnsByObjectConfig[objConfigId].push(item);
+            }
+        }
+
+        var results = [];
+        var successCount = 0;
+        var failCount = 0;
+        var deletedCount = 0;
+        var deleteFailCount = 0;
+
+        
+        for (var objConfigId in columnsByObjectConfig) {
+            var incomingColumns = columnsByObjectConfig[objConfigId];
+            var incomingColumnNames = {};
+            for (var i = 0; i < incomingColumns.length; i++) {
+                incomingColumnNames[incomingColumns[i].column_name] = incomingColumns[i];
+            }
+
+           
+            var existingGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+            existingGr.addQuery('object_config', objConfigId);
+            existingGr.query();
+
+            var existingColumnsToDelete = [];
+            while (existingGr.next()) {
+                var existingColumnName = existingGr.getValue('column_name');
+                if (!incomingColumnNames[existingColumnName]) {
+                   
+                    existingColumnsToDelete.push({
+                        sys_id: existingGr.getUniqueValue(),
+                        column_name: existingColumnName
+                    });
+                }
+            }
+
+      
+            for (var d = 0; d < existingColumnsToDelete.length; d++) {
+                var colToDelete = existingColumnsToDelete[d];
+                try {
+                    var deleteGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+                    deleteGr.addQuery('object_config', objConfigId);
+                    deleteGr.addQuery('column_name', colToDelete.column_name);
+                    deleteGr.setWorkflow(false);
+                    deleteGr.query();
+                    deleteGr.deleteMultiple();
+                    deletedCount++;
+                } catch (deleteErr) {
+                    deleteFailCount++;
+                    results.push({
+                        object_config: objConfigId,
+                        column_name: colToDelete.column_name,
+                        action: 'delete',
+                        success: false,
+                        error: deleteErr.message || String(deleteErr)
+                    });
+                }
+            }
+
+          
+            for (var i = 0; i < incomingColumns.length; i++) {
+                var item = incomingColumns[i];
+                var result = {
+                    object_config: item.object_config,
+                    column_name: item.column_name
+                };
+
+               
+                var checkGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+                checkGr.addQuery('object_config', item.object_config);
+                checkGr.addQuery('column_name', item.column_name);
+                checkGr.query();
+
+                var isUpdate = checkGr.next();
+                var sysId = null;
+
+                try {
+                    var gr;
+                    if (isUpdate) {
+                       
+                        gr = checkGr;
+                        sysId = gr.getUniqueValue();
+                    } else {
+                       
+                        gr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+                        gr.initialize();
+                    }
+
+                   
+                    gr.setValue('object_config', item.object_config);
+                    gr.setValue('column_name', item.column_name);
+
+                   
+                    if (item.column_label !== undefined && item.column_label !== null) {
+                        gr.setValue('column_label', item.column_label);
+                    }
+
+                    if (item.active !== undefined && item.active !== null) {
+                        gr.setValue('active', item.active);
+                    } else if (!isUpdate) {
+                        gr.setValue('active', true);
+                    }
+
+                    if (item.order !== undefined && item.order !== null) {
+                        gr.setValue('order', item.order);
+                    } else if (!isUpdate) {
+                        gr.setValue('order', 100);
+                    }
+
+                   
+                    if (isUpdate) {
+                        gr.update();
+                    } else {
+                        sysId = gr.insert();
+                    }
+
+                    if (!sysId && !isUpdate) {
+                        result.success = false;
+                        result.error = 'Failed to create column configuration';
+                        result.action = 'create';
+                        failCount++;
+                    } else {
+                        result.success = true;
+                        result.sys_id = sysId || checkGr.getUniqueValue();
+                        result.action = isUpdate ? 'updated' : 'created';
+                        successCount++;
+                    }
+                } catch (itemErr) {
+                    result.success = false;
+                    result.error = itemErr.message || String(itemErr);
+                    result.action = isUpdate ? 'update' : 'create';
+                    failCount++;
+                }
+
+                results.push(result);
+            }
+        }
+
+       
+        var allSuccess = (failCount === 0 && deleteFailCount === 0);
+        var statusCode = allSuccess ? 201 : ((successCount > 0 || deletedCount > 0) ? 207 : 400); 
+
+        response.setStatus(statusCode);
+        response.setBody({
+            success: allSuccess,
+            batch: isBatch,
+            total: data.length,
+            succeeded: successCount,
+            failed: failCount,
+            deleted: deletedCount,
+            delete_failed: deleteFailCount,
+            message: allSuccess ? 
+                (successCount + ' columns configured, ' + deletedCount + ' columns removed successfully') :
+                (successCount + ' succeeded, ' + failCount + ' failed, ' + deletedCount + ' deleted, ' + deleteFailCount + ' delete failed'),
+            results: results
+        });
+
+    } catch (err) {
+        response.setStatus(500);
+        response.setBody({
+            success: false,
+            error: err.message || String(err)
+        });
+    }
+})(request, response);
+]]></content>
+    <external_source>false</external_source>
+    <path>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/salesforce-object-column-add-post.js</path>
+    <sys_name>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/salesforce-object-column-add-post.js</sys_name>
+  </sys_module>
+</record_update>

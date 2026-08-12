@@ -1,0 +1,67 @@
+(function process(request, response) {
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+    
+    try {
+        const taskTable = new GlideRecord('sys_db_object');
+        taskTable.addQuery('name', 'task');
+        taskTable.query();
+        
+        if (!taskTable.next()) {
+            writer.writeString(JSON.stringify({
+                result: {
+                    success: false,
+                    error: 'Task table not found',
+                    taskTypes: [],
+                    count: 0
+                }
+            }));
+            return;
+        }
+        
+        const taskSysId = taskTable.getUniqueValue();
+        
+        const gr = new GlideRecord('sys_db_object');
+        gr.addQuery('super_class', taskSysId);
+        gr.orderBy('label');
+        gr.query();
+        
+        const taskTypes = [];
+        
+        while (gr.next()) {
+            const tableName = gr.getValue('name');
+            const tableLabel = gr.getValue('label');
+            
+            taskTypes.push({
+                name: tableName,
+                label: tableLabel,
+                description: gr.getValue('comments') || 'Task type: ' + tableLabel
+            });
+        }
+        
+        taskTypes.sort(function(a, b) {
+            return a.label.localeCompare(b.label);
+        });
+        
+        writer.writeString(JSON.stringify({
+            result: {
+                success: true,
+                taskTypes,
+                count: taskTypes.length
+            }
+        }));
+        
+    } catch (error) {
+        gs.error('Error fetching task types: ' + error.message + '\nStack: ' + error.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            result: {
+                success: false,
+                error: 'Failed to fetch task types: ' + error.message,
+                taskTypes: [],
+                count: 0
+            }
+        }));
+    }
+    
+})(request, response);

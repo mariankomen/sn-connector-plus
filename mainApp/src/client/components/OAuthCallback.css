@@ -1,0 +1,34 @@
+.oauth-callback-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    padding: 40px;
+    text-align: center;
+}
+
+.oauth-status-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.oauth-message {
+    margin-top: 10px;
+    color: #6c757d;
+}
+
+.oauth-success {
+    color: #28a745;
+}
+
+.oauth-error {
+    color: #dc3545;
+}
+
+.btn-go-back {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+}
+

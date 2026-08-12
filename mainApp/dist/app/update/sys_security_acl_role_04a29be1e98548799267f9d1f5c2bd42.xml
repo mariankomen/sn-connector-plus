@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<record_update table="sys_security_acl_role">
+  <sys_security_acl_role action="INSERT_OR_UPDATE">
+    <sys_id>04a29be1e98548799267f9d1f5c2bd42</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_security_acl_role_04a29be1e98548799267f9d1f5c2bd42</sys_update_name>
+    <sys_security_acl>4a783d5400874d68a19ad9bba4edbe0b</sys_security_acl>
+    <sys_user_role name="x_peekl_salesfor_0.salesforce_integration_user_paid">bb5d38b25f6a4e2ebee43cbf33a72ab6</sys_user_role>
+  </sys_security_acl_role>
+</record_update>

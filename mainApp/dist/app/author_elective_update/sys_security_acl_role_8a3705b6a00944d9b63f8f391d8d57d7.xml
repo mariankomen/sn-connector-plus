@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<record_update table="sys_security_acl_role">
+  <sys_security_acl_role action="DELETE">
+    <sys_id>8a3705b6a00944d9b63f8f391d8d57d7</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_security_acl_role_8a3705b6a00944d9b63f8f391d8d57d7</sys_update_name>
+    <sys_security_acl>71c14af1298c4e12aeaf3dd23f779e5e</sys_security_acl>
+    <sys_user_role name="x_peekl_salesfor_0.user">6c4937295767484583be0e6d51f89dce</sys_user_role>
+  </sys_security_acl_role>
+</record_update>

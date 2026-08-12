@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<record_update table="sys_module">
+  <sys_module action="INSERT_OR_UPDATE">
+    <sys_id>a10f476ca29b4e0cbd6d5fa505a0553e</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_module_a10f476ca29b4e0cbd6d5fa505a0553e</sys_update_name>
+    <content><![CDATA[(function process(request, response) {
+
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+
+    function safeJsonParse(s) {
+        try { return JSON.parse(s); } catch (e) { return null; }
+    }
+
+    function getParam(name) {
+        try {
+            if (request && request.queryParams) {
+                if (request.queryParams[name] !== undefined && request.queryParams[name] !== null && request.queryParams[name] !== '') {
+                    return '' + request.queryParams[name];
+                }
+            }
+            if (request && typeof request.getParameter === 'function') {
+                const v2 = request.getParameter(name);
+                if (v2 !== null && v2 !== undefined && v2 !== '') return '' + v2;
+            }
+        } catch (e) { }
+        return null;
+    }
+
+    try {
+        const servicenowTable = getParam('servicenow_table');
+        if (!servicenowTable) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Missing required parameter: servicenow_table'
+            }));
+            return;
+        }
+
+        var instanceName = gs.getProperty('instance_name');
+        const query = `
+        SELECT Id FROM pl_servicenow__ServiceNow_Table__c
+        WHERE pl_servicenow__ServiceNow_Instance__r.pl_servicenow__ServiceNow_Instance_Name__c = '${instanceName}'
+        AND pl_servicenow__ServiceNow_Name__c = '${servicenowTable}'
+        AND pl_servicenow__isChecked__c = true
+        LIMIT 1
+        `;
+        const salesforceObjectService = new x_peekl_salesfor_0.SalesforceObjectService();
+        const linkedRecordsList = salesforceObjectService.query(query);
+
+        response.setStatus(200);
+        writer.writeString(JSON.stringify({
+            success: true,
+            servicenowTable: servicenowTable,
+            instanceName: instanceName,
+            isSyncing: linkedRecordsList.length > 0
+        }));
+        
+
+    } catch (err) {
+        gs.error('Error in Salesforce record link GET handler: ' + err.message + '\nStack: ' + err.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + (err.message || String(err))
+        }));
+    }
+})(request, response);
+
+]]></content>
+    <external_source>false</external_source>
+    <path>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/salesforce-org-settings-get.js</path>
+    <sys_name>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/salesforce-org-settings-get.js</sys_name>
+  </sys_module>
+</record_update>

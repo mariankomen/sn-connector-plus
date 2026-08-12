@@ -1,0 +1,508 @@
+<?xml version="1.0"?>
+<record_update table="sys_ws_operation">
+  <sys_ws_operation action="INSERT_OR_UPDATE">
+    <sys_id>9b038197908943dfa07283db6be68e91</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_ws_operation_9b038197908943dfa07283db6be68e91</sys_update_name>
+    <active>true</active>
+    <consumes>application/json,application/xml,text/xml</consumes>
+    <consumes_customized>false</consumes_customized>
+    <default_operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/search/all</default_operation_uri>
+    <enforce_acl>064a8e03949c49f88bb8321ee55fd0bb</enforce_acl>
+    <http_method>POST</http_method>
+    <name>/salesforce/search/all</name>
+    <operation_script><![CDATA[(function process(request, response) {
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+
+    function safeJsonParse(s) {
+        try { return JSON.parse(s); } catch (e) { return null; }
+    }
+    
+    try {
+        var body = request.body;
+        var requestData;
+        
+        if (typeof body === 'string') {
+            requestData = JSON.parse(body);
+        } else if (body.data) {
+            requestData = body.data;
+        } else {
+            requestData = body;
+        }
+
+        
+        if (!requestData || !requestData.q) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Missing required field: q (search query)'
+            }));
+            return;
+        }
+
+        var servicenowSysId = requestData.servicenow_sys_id;
+        var servicenowTable = requestData.servicenow_table;
+        
+        
+        gs.info('Received request data - filters: ' + JSON.stringify(requestData.filters) + ', object: ' + (requestData.object || requestData.objectName));
+
+        var configGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+        configGr.addQuery('active', true);
+        configGr.addQuery('searchable', true);
+        configGr.orderBy('order');
+        configGr.query();
+
+        var configuredObjects = [];
+        var configSysIdToObjName = {};
+        while (configGr.next()) {
+            var objName = configGr.getValue('sf_object_name');
+            var configSysId = configGr.getUniqueValue();
+            configSysIdToObjName[configSysId] = objName;
+            configuredObjects.push({
+                name: objName,
+                label: configGr.getValue('sf_object_label'),
+                sys_id: configSysId
+            });
+        }
+        
+        var objectColumns = {};
+        var objectColumnMetadata = {}; 
+        var columnsGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+        columnsGr.addQuery('active', true);
+        columnsGr.orderBy('order');
+        columnsGr.orderBy('column_name');
+        columnsGr.query();
+        
+        while (columnsGr.next()) {
+            var objectConfigSysId = columnsGr.getValue('object_config');
+            var columnName = columnsGr.getValue('column_name');
+            var columnLabel = columnsGr.getValue('column_label') || columnName;
+            var columnOrder = parseInt(columnsGr.getValue('order')) || 100;
+            
+            var objName = configSysIdToObjName[objectConfigSysId];
+            if (objName) {
+                if (!objectColumns[objName]) {
+                    objectColumns[objName] = [];
+                    objectColumnMetadata[objName] = [];
+                }
+                if (objectColumns[objName].indexOf(columnName) === -1) {
+                    objectColumns[objName].push(columnName);
+                    objectColumnMetadata[objName].push({
+                        name: columnName,
+                        label: columnLabel,
+                        order: columnOrder
+                    });
+                }
+            }
+        }
+
+        if (configuredObjects.length === 0) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'No configured Salesforce objects found. Please configure objects in Settings first.'
+            }));
+            return;
+        }
+
+        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const lookup = connectionService.getCurrentUserConnection();
+        if (!lookup || !lookup.success) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: (lookup && lookup.error) ? lookup.error : 'No active connection found'
+            }));
+            return;
+        }
+
+        const details = connectionService.getConnectionDetails(lookup.connection_id);
+        if (!details || !details.success || !details.connection) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: (details && details.error) ? details.error : 'Connection details not found'
+            }));
+            return;
+        }
+
+        const connection = details.connection;
+        if (!connection.instance_url) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Salesforce instance_url is missing on the connection'
+            }));
+            return;
+        }
+
+        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const accessToken = oauthService.ensureValidAccessToken({
+            connection: connection,
+            connectionService: connectionService
+        });
+        
+        if (!accessToken) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Unable to obtain Salesforce access token (re-authorize the connection)'
+            }));
+            return;
+        }
+
+        var instanceUrl = connection.instance_url.replace(/\/+$/, '');
+
+        var describeCache = {};
+        function getObjectMetadata(objName) {
+            if (describeCache[objName]) {
+                return describeCache[objName];
+            }
+            
+            var result = {
+                nameField: 'Name', 
+                searchableFields: objectColumns[objName] || ['Name']
+            };
+            
+            try {
+                var describeReq = new sn_ws.RESTMessageV2();
+                describeReq.setEndpoint(instanceUrl + '/services/data/v56.0/sobjects/' + objName + '/describe');
+                describeReq.setHttpMethod('GET');
+                describeReq.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+                describeReq.setRequestHeader('Accept', 'application/json');
+                
+                var describeRes = describeReq.execute();
+                if (describeRes.getStatusCode() === 200) {
+                    var describeData = safeJsonParse(describeRes.getBody());
+                    
+                    if (describeData) {
+                        
+                        if (describeData.nameField) {
+                            result.nameField = describeData.nameField;
+                        } else if (describeData.fields) {
+                            
+                            for (var f = 0; f < describeData.fields.length; f++) {
+                                var field = describeData.fields[f];
+                                if (field.nameField === true) {
+                                    result.nameField = field.name;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (describeErr) {
+                gs.warn('Failed to get describe for ' + objName + ' (using defaults): ' + describeErr);
+            }
+            
+            
+            if (!objectColumns[objName] || objectColumns[objName].length === 0) {
+                
+                return null;
+            }
+            
+            
+            result.searchableFields = objectColumns[objName].slice(); 
+            
+            
+            describeCache[objName] = result;
+            return result;
+        }
+
+        
+        
+        var objectMetadata = {};
+        var allNameFields = new Set(); 
+        var allSearchableFields = new Set(); 
+        var objectsWithColumns = [];
+        
+        for (var d = 0; d < configuredObjects.length; d++) {
+            var obj = configuredObjects[d];
+            var objName = obj.name;
+            var metadata = getObjectMetadata(objName);
+            
+            
+            if (!metadata) {
+                continue;
+            }
+            
+            objectMetadata[objName] = metadata;
+            objectsWithColumns.push(obj);
+            allNameFields.add(metadata.nameField);
+            
+            
+            for (var s = 0; s < metadata.searchableFields.length; s++) {
+                allSearchableFields.add(metadata.searchableFields[s]);
+            }
+        }
+        
+        
+        configuredObjects = objectsWithColumns;
+        
+        
+        if (configuredObjects.length === 0) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'No objects with saved column configurations found. Please configure columns in Column Configure tab first.'
+            }));
+            return;
+        }
+
+        
+        var requestedObject = requestData.object || requestData.objectName;
+        if (requestedObject) {
+            var filteredObjects = [];
+            for (var fo = 0; fo < configuredObjects.length; fo++) {
+                if (configuredObjects[fo].name === requestedObject) {
+                    filteredObjects.push(configuredObjects[fo]);
+                    break;
+                }
+            }
+            if (filteredObjects.length === 0) {
+                response.setStatus(400);
+                writer.writeString(JSON.stringify({
+                    success: false,
+                    error: 'Requested object "' + requestedObject + '" is not configured or does not have column configurations.'
+                }));
+                return;
+            }
+            configuredObjects = filteredObjects;
+        }
+
+        
+        var sobjects = [];
+        var limit = requestData.limit || 20;
+
+        for (var i = 0; i < configuredObjects.length; i++) {
+            var obj = configuredObjects[i];
+            var objName = obj.name;
+            var metadata = objectMetadata[objName];
+            var objNameField = metadata.nameField;
+            
+            
+            var objFields = requestData.fields;
+            if (!objFields) {
+                
+                objFields = ['id', objNameField];
+                
+                var searchableFields = metadata.searchableFields || [];
+                for (var sf = 0; sf < searchableFields.length && sf < 20; sf++) { 
+                    var searchableField = searchableFields[sf];
+                    if (searchableField !== 'id' && searchableField !== objNameField && objFields.indexOf(searchableField) === -1) {
+                        objFields.push(searchableField);
+                    }
+                }
+            } else {
+                
+                var fieldsArray = objFields.slice();
+                if (fieldsArray.indexOf('id') === -1) {
+                    fieldsArray.unshift('id');
+                }
+                if (fieldsArray.indexOf(objNameField) === -1) {
+                    fieldsArray.push(objNameField);
+                }
+                objFields = fieldsArray;
+            }
+            
+            var sobject = {
+                name: objName,
+                limit: limit,
+                fields: objFields
+            };
+
+            
+            if (requestData.filters && typeof requestData.filters === 'object') {
+                gs.info('Checking filters for object ' + objName + '. Available filters: ' + Object.keys(requestData.filters).join(', '));
+                if (requestData.filters[objName]) {
+                    sobject.where = requestData.filters[objName];
+                    gs.info('Applying WHERE clause for ' + objName + ': ' + sobject.where);
+                } else {
+                    gs.info('No WHERE clause found for object ' + objName + ' in filters object');
+                }
+            } else if (requestData.where) {
+                
+                sobject.where = requestData.where;
+                gs.info('Applying global WHERE clause: ' + sobject.where);
+            } else {
+                gs.info('No filters or where clause provided for object ' + objName);
+            }
+
+            sobjects.push(sobject);
+        }
+
+        
+        var requestFields = requestData.fields;
+        if (!requestFields) {
+            
+            requestFields = Array.from(allNameFields);
+            
+            var searchableFieldsArray = Array.from(allSearchableFields);
+            for (var rf = 0; rf < searchableFieldsArray.length && rf < 50; rf++) { 
+                var sfField = searchableFieldsArray[rf];
+                if (requestFields.indexOf(sfField) === -1) {
+                    requestFields.push(sfField);
+                }
+            }
+        }
+
+        
+        
+        
+        var searchIn = requestData.in;
+        if (!searchIn || searchIn === 'ALL') {
+            
+            var searchableFieldsArray = Array.from(allSearchableFields);
+            
+            if (searchableFieldsArray.length === 0) {
+                searchableFieldsArray = Array.from(allNameFields);
+            }
+            
+            if (searchableFieldsArray.length > 0) {
+                searchIn = searchableFieldsArray.join(',');
+            } else {
+                searchIn = 'ALL'; 
+            }
+        }
+
+        
+        var sfRequest = {
+            q: requestData.q,
+            fields: requestFields,
+            sobjects: sobjects,
+            in: searchIn, 
+            metadata: requestData.metadata || 'LABELS'
+        };
+        
+        
+        gs.info('Salesforce search request: ' + JSON.stringify(sfRequest, null, 2));
+
+        
+        var endpoint = instanceUrl + '/services/data/v56.0/parameterizedSearch/';
+        var restMessage = new sn_ws.RESTMessageV2();
+        restMessage.setEndpoint(endpoint);
+        restMessage.setHttpMethod('POST');
+        restMessage.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        restMessage.setRequestHeader('Content-Type', 'application/json');
+        restMessage.setRequestHeader('Accept', 'application/json');
+        restMessage.setRequestBody(JSON.stringify(sfRequest));
+
+        var restResponse = restMessage.execute();
+        var httpStatus = restResponse.getStatusCode();
+        var responseBody = restResponse.getBody();
+
+        if (httpStatus >= 200 && httpStatus < 300) {
+            var sfData = safeJsonParse(responseBody);
+            if (!sfData) {
+                response.setStatus(500);
+                writer.writeString(JSON.stringify({
+                    success: false,
+                    error: 'Failed to parse Salesforce response'
+                }));
+                return;
+            }
+            
+            
+            if (sfData.searchRecords && sfData.searchRecords.length > 0) {
+                var firstRecord = sfData.searchRecords[0];
+            }
+            
+            
+            var groupedResults = {};
+            var allResults = sfData.searchRecords || [];
+            var searchTermLower = requestData.q.toLowerCase();
+            
+          
+            var filteredResults = [...allResults];
+            
+            
+            for (var j = 0; j < filteredResults.length; j++) {
+                var record = filteredResults[j];
+                var objectType = (record.attributes && record.attributes.type) ? record.attributes.type : 'Unknown';
+                
+                if (!groupedResults[objectType]) {
+                    
+                    var objectLabel = objectType;
+                    for (var k = 0; k < configuredObjects.length; k++) {
+                        if (configuredObjects[k].name === objectType) {
+                            objectLabel = configuredObjects[k].label;
+                            break;
+                        }
+                    }
+                    
+                    groupedResults[objectType] = {
+                        objectType: objectType,
+                        objectLabel: objectLabel,
+                        nameField: (objectMetadata[objectType] && objectMetadata[objectType].nameField) || 'Name', 
+                        columns: objectColumnMetadata[objectType] || [], 
+                        records: []
+                    };
+                }
+                
+                groupedResults[objectType].records.push(record);
+            }
+            
+            
+            var searchedObjectsArray = [];
+            for (var m = 0; m < configuredObjects.length; m++) {
+                searchedObjectsArray.push(configuredObjects[m].name);
+            }
+            
+            response.setStatus(200);
+            writer.writeString(JSON.stringify({
+                success: true,
+                searchRecords: filteredResults,
+                groupedByObject: groupedResults,
+                metadata: sfData.metadata || null,
+                searchedObjects: searchedObjectsArray,
+                nameFields: (function() {
+                 
+                    var nameFieldsMap = {};
+                    for (var objName in objectMetadata) {
+                        nameFieldsMap[objName] = objectMetadata[objName].nameField;
+                    }
+                    return nameFieldsMap;
+                })(),
+                filteredOutCount: servicenowSysId ? (allResults.length - filteredResults.length) : 0 
+            }));
+        } else {
+            var errorData = safeJsonParse(responseBody);
+            if (!errorData) {
+                errorData = { error: responseBody };
+            }
+
+            gs.error('Salesforce search failed. Status=' + httpStatus + ' Body=' + responseBody);
+            response.setStatus(httpStatus);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: errorData.message || errorData[0]?.message || errorData.error || 'Salesforce API error',
+                details: errorData
+            }));
+        }
+
+    } catch (err) {
+        gs.error('Error in Salesforce search handler: ' + err.message + '\nStack: ' + err.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + (err.message || String(err))
+        }));
+    }
+})(request, response);
+
+]]></operation_script>
+    <operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/search/all</operation_uri>
+    <produces>application/json,application/xml,text/xml</produces>
+    <produces_customized>false</produces_customized>
+    <relative_path>/salesforce/search/all</relative_path>
+    <request_example/>
+    <requires_acl_authorization>true</requires_acl_authorization>
+    <requires_authentication>true</requires_authentication>
+    <requires_snc_internal_role>true</requires_snc_internal_role>
+    <short_description>Search across ALL configured Salesforce objects with a single query (automatically includes all active, searchable objects)</short_description>
+    <sys_policy/>
+    <web_service_definition>25cee077e5594db7b73b41a697f46061</web_service_definition>
+    <web_service_version/>
+  </sys_ws_operation>
+</record_update>

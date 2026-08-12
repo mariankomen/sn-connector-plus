@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<record_update table="sys_ws_operation">
+  <sys_ws_operation action="INSERT_OR_UPDATE">
+    <sys_id>0d12213b63c5433fada57c2c502e383d</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_ws_operation_0d12213b63c5433fada57c2c502e383d</sys_update_name>
+    <active>true</active>
+    <consumes>application/json,application/xml,text/xml</consumes>
+    <consumes_customized>false</consumes_customized>
+    <default_operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/connection</default_operation_uri>
+    <enforce_acl>064a8e03949c49f88bb8321ee55fd0bb</enforce_acl>
+    <http_method>GET</http_method>
+    <name>/connection</name>
+    <operation_script><![CDATA[(function process(request, response) {
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+
+    try {
+        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const currentConnection = connectionService.getCurrentUserConnection();
+        if (!currentConnection.success) {
+            response.setStatus(404);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: currentConnection.error || 'No active connection found'
+            }));
+            return;
+        }
+
+        const connectionResult = connectionService.getConnectionById(currentConnection.connection_id);
+        if (!connectionResult.success) {
+            response.setStatus(404);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: connectionResult.error || 'Connection details not found'
+            }));
+            return;
+        }
+
+        const connection = connectionResult.connection || {};
+
+        response.setStatus(200);
+        writer.writeString(JSON.stringify({
+            success: true,
+            result: {
+                instanceUrl: connection.instance_url || ''
+            }
+        }));
+    } catch (error) {
+        gs.error('Error in Salesforce connection GET handler: ' + error.message + '\nStack: ' + error.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + error.message
+        }));
+    }
+})(request, response);
+
+
+]]></operation_script>
+    <operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/connection</operation_uri>
+    <produces>application/json,application/xml,text/xml</produces>
+    <produces_customized>false</produces_customized>
+    <relative_path>/connection</relative_path>
+    <request_example/>
+    <requires_acl_authorization>true</requires_acl_authorization>
+    <requires_authentication>true</requires_authentication>
+    <requires_snc_internal_role>true</requires_snc_internal_role>
+    <short_description>Get current Salesforce connection details</short_description>
+    <sys_policy/>
+    <web_service_definition>25cee077e5594db7b73b41a697f46061</web_service_definition>
+    <web_service_version/>
+  </sys_ws_operation>
+</record_update>

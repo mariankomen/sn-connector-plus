@@ -1,0 +1,627 @@
+(function process(request, response) {
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+
+    function safeJsonParse(s) {
+        try { return JSON.parse(s); } catch (e) { return null; }
+    }
+
+    function getParam(name) {
+        try {
+            if (request && request.queryParams) {
+                if (request.queryParams[name] !== undefined && request.queryParams[name] !== null && request.queryParams[name] !== '') {
+                    return '' + request.queryParams[name];
+                }
+            }
+            if (request && typeof request.getParameter === 'function') {
+                const v2 = request.getParameter(name);
+                if (v2 !== null && v2 !== undefined && v2 !== '') return '' + v2;
+            }
+        } catch (e) { }
+        return null;
+    }
+
+    function isSalesforceId(id) {
+        return /^[a-zA-Z0-9]{15}$|^[a-zA-Z0-9]{18}$/.test(id);
+    }
+
+    function addViewUrlsToRecord(record, instanceUrl) {
+        if (!record || typeof record !== 'object' || !instanceUrl) {
+            return record;
+        }
+
+        var result = JSON.parse(JSON.stringify(record));
+
+        for (var fieldName in record) {
+            if (fieldName === 'attributes' || fieldName.endsWith('_url')) {
+                continue;
+            }
+
+            var fieldValue = record[fieldName];
+            
+            if (!fieldValue || typeof fieldValue !== 'string') {
+                continue;
+            }
+
+            
+            var isIdField = (fieldName.endsWith('Id') || fieldName.endsWith('__c')) && 
+                           isSalesforceId(fieldValue);
+            
+            if (isIdField) {
+                var viewUrl = instanceUrl + '/' + fieldValue;
+                result[fieldName + '_url'] = viewUrl;
+            }
+        }
+
+        return result;
+    }
+
+    try {
+        
+        var objectName = getParam('object_name') || getParam('objectName');
+        var recordId = getParam('record_id') || getParam('recordId');
+
+        if (!objectName) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Missing required parameter: object_name'
+            }));
+            return;
+        }
+
+        if (!recordId) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Missing required parameter: record_id'
+            }));
+            return;
+        }
+
+        if (!isSalesforceId(recordId)) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Invalid recordId format. Salesforce IDs must be 15 or 18 alphanumeric characters.'
+            }));
+            return;
+        }
+
+        
+        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const lookup = connectionService.getCurrentUserConnection();
+        if (!lookup || !lookup.success) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: (lookup && lookup.error) ? lookup.error : 'No active connection found'
+            }));
+            return;
+        }
+
+        const details = connectionService.getConnectionDetails(lookup.connection_id);
+        if (!details || !details.success || !details.connection) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: (details && details.error) ? details.error : 'Connection details not found'
+            }));
+            return;
+        }
+
+        const connection = details.connection;
+        if (!connection.instance_url) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Salesforce instance_url is missing on the connection'
+            }));
+            return;
+        }
+
+        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const accessToken = oauthService.ensureValidAccessToken({
+            connection: connection,
+            connectionService: connectionService
+        });
+        if (!accessToken) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Unable to obtain Salesforce access token (re-authorize the connection)'
+            }));
+            return;
+        }
+
+        const instanceUrl = connection.instance_url.replace(/\/+$/, '');
+
+        var objConfigGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+        objConfigGr.addQuery('sf_object_name', objectName);
+        objConfigGr.query();
+        
+        if (!objConfigGr.next()) {
+            response.setStatus(404);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Object configuration not found for object_name: ' + objectName
+            }));
+            return;
+        }
+
+        var objectConfigSysId = objConfigGr.getUniqueValue();
+
+        
+        var selectedRelGr = new GlideRecord('x_peekl_salesfor_0_salesforce_selected_related_objects');
+        selectedRelGr.addQuery('object_config', objectConfigSysId);
+        selectedRelGr.addQuery('active', true);
+        selectedRelGr.orderBy('order');
+        selectedRelGr.query();
+
+        var selectedRelationships = [];
+        while (selectedRelGr.next()) {
+            selectedRelationships.push({
+                sys_id: selectedRelGr.getUniqueValue(),
+                relationship_name: selectedRelGr.getValue('relationship_name'),
+                relationship_label: selectedRelGr.getValue('relationship_label') || selectedRelGr.getValue('relationship_name')
+            });
+        }
+
+        if (selectedRelationships.length === 0) {
+            response.setStatus(200);
+            writer.writeString(JSON.stringify({
+                success: true,
+                object_name: objectName,
+                record_id: recordId,
+                message: 'No selected related objects found for this object',
+                related_records: {}
+            }));
+            return;
+        }
+
+        
+        const parentDescribeEndpoint = instanceUrl + '/services/data/v58.0/sobjects/' + objectName + '/describe';
+        const parentDescribeReq = new sn_ws.RESTMessageV2();
+        parentDescribeReq.setEndpoint(parentDescribeEndpoint);
+        parentDescribeReq.setHttpMethod('GET');
+        parentDescribeReq.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        parentDescribeReq.setRequestHeader('Accept', 'application/json');
+
+        const parentDescribeRes = parentDescribeReq.execute();
+        const parentDescribeStatus = parentDescribeRes.getStatusCode();
+        const parentDescribeBody = parentDescribeRes.getBody();
+        const parentDescribeData = safeJsonParse(parentDescribeBody);
+
+        if (parentDescribeStatus < 200 || parentDescribeStatus >= 300 || !parentDescribeData) {
+            response.setStatus(parentDescribeStatus || 500);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Failed to get parent object describe: ' + (parentDescribeData && parentDescribeData.message ? parentDescribeData.message : parentDescribeBody || 'Unknown error')
+            }));
+            return;
+        }
+
+        
+        var childRelationships = parentDescribeData.childRelationships || [];
+        var relationshipMap = {};
+        for (var i = 0; i < childRelationships.length; i++) {
+            var rel = childRelationships[i];
+            if (rel.relationshipName && rel.childSObject && rel.field) {
+                relationshipMap[rel.relationshipName] = {
+                    childSObject: rel.childSObject,
+                    field: rel.field,
+                    label: rel.label || rel.relationshipName
+                };
+            }
+        }
+
+        
+        var childDescribeCache = {};
+
+        
+        var relatedRecords = {};
+        var totalRecords = 0;
+
+        for (var k = 0; k < selectedRelationships.length; k++) {
+            var selRel = selectedRelationships[k];
+            var relationshipName = selRel.relationship_name;
+            var relationshipInfo = relationshipMap[relationshipName];
+
+            if (!relationshipInfo) {
+                
+                relatedRecords[relationshipName] = {
+                    relationship_name: relationshipName,
+                    relationship_label: selRel.relationship_label,
+                    success: false,
+                    error: 'Relationship not found in Salesforce describe API',
+                    records: [],
+                    totalSize: 0
+                };
+                continue;
+            }
+
+            var childObjectName = relationshipInfo.childSObject;
+            var relationshipField = relationshipInfo.field;
+
+            
+            var columnsGr = new GlideRecord('x_peekl_salesfor_0_salesforce_related_object_columns');
+            columnsGr.addQuery('selected_related_object', selRel.sys_id);
+            columnsGr.addQuery('active', true);
+            columnsGr.orderBy('order');
+            columnsGr.query();
+
+            var selectedColumns = [];
+            while (columnsGr.next()) {
+                selectedColumns.push(columnsGr.getValue('column_name'));
+            }
+
+            
+            if (selectedColumns.length === 0) {
+                selectedColumns = ['Id'];
+            }
+
+            
+            var columnLabels = {};
+            var childObjectMetadata = null;
+            try {
+                if (!childDescribeCache[childObjectName]) {
+                    const childDescribeEndpoint = instanceUrl + '/services/data/v58.0/sobjects/' + childObjectName + '/describe';
+                    const childDescribeReq = new sn_ws.RESTMessageV2();
+                    childDescribeReq.setEndpoint(childDescribeEndpoint);
+                    childDescribeReq.setHttpMethod('GET');
+                    childDescribeReq.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+                    childDescribeReq.setRequestHeader('Accept', 'application/json');
+
+                    const childDescribeRes = childDescribeReq.execute();
+                    const childDescribeStatus = childDescribeRes.getStatusCode();
+                    const childDescribeBody = childDescribeRes.getBody();
+                    const childDescribeData = safeJsonParse(childDescribeBody);
+
+                    if (childDescribeStatus >= 200 && childDescribeStatus < 300 && childDescribeData) {
+                        var fieldLabelMap = {};
+                        if (Array.isArray(childDescribeData.fields)) {
+                            for (var f = 0; f < childDescribeData.fields.length; f++) {
+                                var field = childDescribeData.fields[f];
+                                if (field && field.name) {
+                                    fieldLabelMap[field.name] = field.label || field.name;
+                                }
+                            }
+                        }
+                        
+                        childDescribeCache[childObjectName] = {
+                            fieldLabels: fieldLabelMap,
+                            metadata: childDescribeData
+                        };
+                    } else {
+                        gs.warn('[Peeklo] Failed to describe child object for labels: ' + childObjectName + ', status=' + childDescribeStatus);
+                        childDescribeCache[childObjectName] = {
+                            fieldLabels: {},
+                            metadata: null
+                        };
+                    }
+                }
+
+                var cachedData = childDescribeCache[childObjectName] || { fieldLabels: {}, metadata: null };
+                var labelMap = cachedData.fieldLabels || {};
+                childObjectMetadata = cachedData.metadata;
+                
+                for (var c = 0; c < selectedColumns.length; c++) {
+                    var colName = selectedColumns[c];
+                    
+                    var baseName = colName.indexOf('.') !== -1 ? colName.split('.').pop() : colName;
+                    columnLabels[colName] = labelMap[baseName] || baseName || colName;
+                }
+            } catch (labelErr) {
+                gs.warn('[Peeklo] Error resolving column labels for ' + childObjectName + ': ' + labelErr.message);
+            }
+            
+            
+            var shouldTryContentDocumentLinkFallback = function(objName, objMetadata, relName) {
+                
+                if (objMetadata && objMetadata.deprecated === true) {
+                    gs.info('[Peeklo] Object ' + objName + ' is deprecated, considering ContentDocumentLink fallback');
+                    return true;
+                }
+                
+                
+                var relNameLower = (relName || '').toLowerCase();
+                var attachmentPatterns = ['attachment', 'file', 'document', 'content'];
+                for (var p = 0; p < attachmentPatterns.length; p++) {
+                    if (relNameLower.indexOf(attachmentPatterns[p]) !== -1) {
+                        gs.info('[Peeklo] Relationship name "' + relName + '" suggests file/attachment relationship, considering ContentDocumentLink fallback');
+                        return true;
+                    }
+                }
+                
+                
+                var objNameLower = (objName || '').toLowerCase();
+                if (objNameLower === 'attachment' || objNameLower.indexOf('attachment') !== -1) {
+                    gs.info('[Peeklo] Object name "' + objName + '" suggests attachment object, considering ContentDocumentLink fallback');
+                    return true;
+                }
+                
+                return false;
+            };
+
+            
+            var soqlQuery;
+            if (childObjectName === 'ContentDocumentLink') {
+                
+                var contentDocFields = selectedColumns.map(function(col) {
+                    return 'ContentDocument.' + col;
+                });
+                soqlQuery = "SELECT " + contentDocFields.join(', ') + ", LinkedEntityId " +
+                           " FROM ContentDocumentLink " +
+                           " WHERE LinkedEntityId = '" + recordId + "' " +
+                           " AND ContentDocument.FileType != null " +
+                           " LIMIT 100";
+            } else {
+                
+                
+                
+                
+                
+                soqlQuery = "SELECT " + selectedColumns.join(', ') + 
+                           " FROM " + childObjectName + 
+                           " WHERE " + relationshipField + " = '" + recordId + "'" +
+                           " LIMIT 100";
+            }
+
+            
+            gs.info('[Peeklo] Querying relationship: ' + relationshipName + ' (' + childObjectName + ')');
+
+            
+            try {
+                const queryEndpoint = instanceUrl + '/services/data/v58.0/query?q=' + encodeURIComponent(soqlQuery);
+                
+                const queryRm = new sn_ws.RESTMessageV2();
+                queryRm.setEndpoint(queryEndpoint);
+                queryRm.setHttpMethod('GET');
+                queryRm.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+                queryRm.setRequestHeader('Accept', 'application/json');
+
+                const queryRr = queryRm.execute();
+                const queryStatus = queryRr.getStatusCode();
+                const queryBody = queryRr.getBody();
+                const queryData = safeJsonParse(queryBody);
+
+                gs.info('[Peeklo] Query status for ' + relationshipName + ': ' + queryStatus);
+                if (queryData) {
+                    gs.info('[Peeklo] Query response totalSize: ' + (queryData.totalSize || 0));
+                    gs.info('[Peeklo] Query response records count: ' + ((queryData.records && queryData.records.length) || 0));
+                    if (queryData.totalSize === 0 && queryData.records && queryData.records.length === 0) {
+                        gs.warn('[Peeklo] No records found for relationship: ' + relationshipName + ', query: ' + soqlQuery);
+                    }
+                } else {
+                    gs.warn('[Peeklo] Query response body: ' + queryBody.substring(0, 500));
+                }
+
+                if (queryStatus >= 200 && queryStatus < 300 && queryData) {
+                    var records = queryData.records || [];
+                    
+                    
+                    if (records.length === 0 && queryData.totalSize === 0 && childObjectName !== 'ContentDocumentLink') {
+                        gs.info('[Peeklo] Trying alternative query methods for: ' + relationshipName);
+                        
+                        
+                        if (shouldTryContentDocumentLinkFallback(childObjectName, childObjectMetadata, relationshipName)) {
+                            try {
+                                gs.info('[Peeklo] Trying ContentDocumentLink as fallback for ' + childObjectName + ' (relationship: ' + relationshipName + ')...');
+                                
+                                
+                                var contentDocDescribeEndpoint = instanceUrl + '/services/data/v58.0/sobjects/ContentDocument/describe';
+                                const contentDocDescribeReq = new sn_ws.RESTMessageV2();
+                                contentDocDescribeReq.setEndpoint(contentDocDescribeEndpoint);
+                                contentDocDescribeReq.setHttpMethod('GET');
+                                contentDocDescribeReq.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+                                contentDocDescribeReq.setRequestHeader('Accept', 'application/json');
+                                
+                                const contentDocDescribeRes = contentDocDescribeReq.execute();
+                                const contentDocDescribeStatus = contentDocDescribeRes.getStatusCode();
+                                const contentDocDescribeBody = contentDocDescribeRes.getBody();
+                                const contentDocDescribeData = safeJsonParse(contentDocDescribeBody);
+                                
+                                
+                                var contentDocFieldMap = {};
+                                if (contentDocDescribeStatus >= 200 && contentDocDescribeStatus < 300 && contentDocDescribeData && Array.isArray(contentDocDescribeData.fields)) {
+                                    for (var df = 0; df < contentDocDescribeData.fields.length; df++) {
+                                        var descField = contentDocDescribeData.fields[df];
+                                        if (descField && descField.name) {
+                                            contentDocFieldMap[descField.name.toLowerCase()] = descField.name;
+                                        }
+                                    }
+                                }
+                                
+                                
+                                var contentDocFields = [];
+                                var sourceToContentDocMap = {};
+                                
+                                for (var m = 0; m < selectedColumns.length; m++) {
+                                    var col = selectedColumns[m];
+                                    var colLower = col.toLowerCase();
+                                    
+                                   
+                                    var mappedField = null;
+                                    if (colLower === 'name' && contentDocFieldMap['title']) {
+                                        mappedField = 'ContentDocument.Title';
+                                        sourceToContentDocMap[col] = 'Title';
+                                    } else if (colLower === 'contenttype' && contentDocFieldMap['filetype']) {
+                                        mappedField = 'ContentDocument.FileType';
+                                        sourceToContentDocMap[col] = 'FileType';
+                                    } else if (contentDocFieldMap[colLower]) {
+                                        
+                                        mappedField = 'ContentDocument.' + contentDocFieldMap[colLower];
+                                        sourceToContentDocMap[col] = contentDocFieldMap[colLower];
+                                    } else {
+                                        
+                                        mappedField = 'ContentDocument.' + col;
+                                        sourceToContentDocMap[col] = col;
+                                    }
+                                    
+                                    if (mappedField) {
+                                        contentDocFields.push(mappedField);
+                                    }
+                                }
+                                
+                                var contentDocQuery = "SELECT " + contentDocFields.join(', ') + ", LinkedEntityId " +
+                                                     " FROM ContentDocumentLink " +
+                                                     " WHERE LinkedEntityId = '" + recordId + "' " +
+                                                     " AND ContentDocument.FileType != null " +
+                                                     " LIMIT 100";
+                                
+                                gs.info('[Peeklo] ContentDocumentLink fallback query: ' + contentDocQuery);
+                                
+                                const contentDocEndpoint = instanceUrl + '/services/data/v58.0/query?q=' + encodeURIComponent(contentDocQuery);
+                                const contentDocRm = new sn_ws.RESTMessageV2();
+                                contentDocRm.setEndpoint(contentDocEndpoint);
+                                contentDocRm.setHttpMethod('GET');
+                                contentDocRm.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+                                contentDocRm.setRequestHeader('Accept', 'application/json');
+
+                                const contentDocRr = contentDocRm.execute();
+                                const contentDocStatus = contentDocRr.getStatusCode();
+                                const contentDocBody = contentDocRr.getBody();
+                                const contentDocData = safeJsonParse(contentDocBody);
+                                
+                                gs.info('[Peeklo] ContentDocumentLink fallback query status: ' + contentDocStatus);
+                                if (contentDocData) {
+                                    gs.info('[Peeklo] ContentDocumentLink fallback response totalSize: ' + (contentDocData.totalSize || 0));
+                                }
+
+                                if (contentDocStatus >= 200 && contentDocStatus < 300 && contentDocData && contentDocData.records && contentDocData.records.length > 0) {
+                                    
+                                    var transformedRecords = [];
+                                    for (var t = 0; t < contentDocData.records.length; t++) {
+                                        var cdlRecord = contentDocData.records[t];
+                                        var transformedRecord = {};
+                                        
+                                        
+                                        if (cdlRecord.ContentDocument) {
+                                            var cd = cdlRecord.ContentDocument;
+                                            
+                                            
+                                            for (var sc = 0; sc < selectedColumns.length; sc++) {
+                                                var sourceField = selectedColumns[sc];
+                                                var contentDocField = sourceToContentDocMap[sourceField];
+                                                
+                                                if (contentDocField && cd[contentDocField] !== undefined) {
+                                                    transformedRecord[sourceField] = cd[contentDocField];
+                                                } else if (cd[sourceField] !== undefined) {
+                                                    
+                                                    transformedRecord[sourceField] = cd[sourceField];
+                                                }
+                                            }
+                                            
+                                            
+                                            for (var cdKey in cd) {
+                                                if (cdKey !== 'attributes') {
+                                                    transformedRecord['ContentDocument.' + cdKey] = cd[cdKey];
+                                                }
+                                            }
+                                        }
+                                        
+                                        transformedRecords.push(transformedRecord);
+                                    }
+                                    
+                                    records = transformedRecords;
+                                    gs.info('[Peeklo] ContentDocumentLink fallback found ' + records.length + ' records (transformed from ContentDocumentLink for ' + childObjectName + ')');
+                                }
+                            } catch (contentDocErr) {
+                                gs.warn('[Peeklo] ContentDocumentLink fallback failed: ' + contentDocErr.message);
+                            }
+                        }
+                    }
+                    
+                    
+                    var processedRecords = [];
+                    for (var r = 0; r < records.length; r++) {
+                        var record = records[r];
+                        var cleanRecord = {};
+                        for (var key in record) {
+                            if (key !== 'attributes') {
+                                
+                                if (key === 'ContentDocument' && typeof record[key] === 'object' && record[key] !== null) {
+                                    
+                                    for (var docKey in record[key]) {
+                                        if (docKey !== 'attributes') {
+                                            cleanRecord['ContentDocument.' + docKey] = record[key][docKey];
+                                        }
+                                    }
+                                    
+                                    cleanRecord.ContentDocument = record[key];
+                                } else {
+                                    cleanRecord[key] = record[key];
+                                }
+                            }
+                        }
+                        
+                        var recordWithUrls = addViewUrlsToRecord(cleanRecord, instanceUrl);
+                        processedRecords.push(recordWithUrls);
+                    }
+                    
+                    totalRecords += processedRecords.length;
+                    
+                    relatedRecords[relationshipName] = {
+                        relationship_name: relationshipName,
+                        relationship_label: selRel.relationship_label,
+                        child_object_name: childObjectName,
+                        relationship_field: relationshipField,
+                        success: true,
+                        totalSize: queryData.totalSize || processedRecords.length,
+                        records: processedRecords,
+                        columns: selectedColumns,
+                        column_labels: columnLabels,
+                        soql_query: soqlQuery,
+                        query_status: queryStatus
+                    };
+                } else {
+                    relatedRecords[relationshipName] = {
+                        relationship_name: relationshipName,
+                        relationship_label: selRel.relationship_label,
+                        child_object_name: childObjectName,
+                        relationship_field: relationshipField,
+                        success: false,
+                        error: 'Query failed: ' + (queryData && queryData.message ? queryData.message : 'Unknown error'),
+                        error_details: queryData || queryBody,
+                        records: [],
+                        totalSize: 0,
+                        soql_query: soqlQuery,
+                        query_status: queryStatus
+                    };
+                }
+            } catch (queryErr) {
+                gs.error('[Peeklo] Error querying relationship ' + relationshipName + ': ' + queryErr.message);
+                relatedRecords[relationshipName] = {
+                    relationship_name: relationshipName,
+                    relationship_label: selRel.relationship_label,
+                    child_object_name: childObjectName,
+                    relationship_field: relationshipField,
+                    success: false,
+                    error: 'Query error: ' + queryErr.message,
+                    records: [],
+                    totalSize: 0,
+                    soql_query: soqlQuery
+                };
+            }
+        }
+
+        response.setStatus(200);
+        writer.writeString(JSON.stringify({
+            success: true,
+            object_name: objectName,
+            record_id: recordId,
+            total_relationships: Object.keys(relatedRecords).length,
+            total_records: totalRecords,
+            related_records: relatedRecords
+        }));
+
+    } catch (error) {
+        gs.error('Error in Salesforce related records GET handler: ' + error.message + '\nStack: ' + error.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + error.message
+        }));
+    }
+
+})(request, response);

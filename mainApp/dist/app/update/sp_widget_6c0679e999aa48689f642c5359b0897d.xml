@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<record_update table="sp_widget">
+  <sp_widget action="INSERT_OR_UPDATE">
+    <sys_id>6c0679e999aa48689f642c5359b0897d</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sp_widget_6c0679e999aa48689f642c5359b0897d</sys_update_name>
+    <category>custom</category>
+    <client_script><![CDATA[api.controller = function ($scope, $window) {
+    var c = this
+
+    if (c.data && c.data.sessionToken) {
+        try {
+            $window.g_ck = c.data.sessionToken
+        } catch (e) {
+            window.g_ck = c.data.sessionToken
+        }
+    }
+
+    if (!c.data) {
+        return
+    }
+
+    var existing = document.querySelector('script[data-x-peekl-salesfor-0-bundle="true"]')
+    if (existing) {
+        return
+    }
+
+    var loadBundle = function (bundleUrl) {
+        if (!bundleUrl) {
+            return
+        }
+        var script = document.createElement('script')
+        script.type = 'module'
+        script.src = bundleUrl
+        script.crossOrigin = 'anonymous'
+        script.setAttribute('data-x-peekl-salesfor-0-bundle', 'true')
+        document.body.appendChild(script)
+    }
+
+    var deriveBundleUrlFromIndex = function (indexHtml) {
+        if (!indexHtml) {
+            return ''
+        }
+        var match = indexHtml.match(/src\s*=\s*["']([^"']*\/main\.jsdbx[^"']*)["']/i)
+        if (!match || !match[1]) {
+            return ''
+        }
+        var url = match[1]
+        var q = url.indexOf('?')
+        return q >= 0 ? url.substring(0, q) : url
+    }
+
+    fetch(c.data.bundleIndexUrl, { credentials: 'same-origin' })
+        .then(function (res) {
+            if (!res.ok) {
+                throw new Error('Failed to load bundle index: ' + res.status)
+            }
+            return res.text()
+        })
+        .then(function (html) {
+            var dynamicUrl = deriveBundleUrlFromIndex(html)
+            loadBundle(dynamicUrl || c.data.bundleUrlFallback)
+        })
+        .catch(function () {
+            loadBundle(c.data.bundleUrlFallback)
+        })
+}
+]]></client_script>
+    <controller_as>c</controller_as>
+    <css/>
+    <data_table>sp_instance</data_table>
+    <demo_data/>
+    <description>Hosts the Peeklogic Salesforce Integration React UI inside Service Portal. sp_page ID must match the app (see connector portal URL in source) so /sp?id=... and OAuth return URLs resolve.</description>
+    <docs/>
+    <field_list/>
+    <has_preview>false</has_preview>
+    <id>x_peekl_salesfor_0_salesforce_integration</id>
+    <internal>false</internal>
+    <link>function link(scope, element, attrs, controller) {
+}</link>
+    <name>Peeklogic Salesforce Connector</name>
+    <option_schema/>
+    <public>false</public>
+    <roles>x_peekl_salesfor_0.salesforce_integration_user_paid</roles>
+    <script><![CDATA[;(function () {
+    data.sessionToken = gs.getSession().getSessionToken()
+    data.bundleIndexUrl = '/uxasset/externals/x_peekl_salesfor_0/dist/static/index.html'
+    data.bundleUrlFallback = '/uxasset/externals/x_peekl_salesfor_0/main.jsdbx'
+})()
+]]></script>
+    <servicenow>false</servicenow>
+    <template>&lt;div class="x-peekl-salesfor-0-salesforce-integration"&gt;
+  &lt;div id="root"&gt;&lt;/div&gt;
+&lt;/div&gt;</template>
+  </sp_widget>
+</record_update>

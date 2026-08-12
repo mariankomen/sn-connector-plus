@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<record_update table="sys_ws_operation">
+  <sys_ws_operation action="INSERT_OR_UPDATE">
+    <sys_id>edb6b810c5df4d33879124fc3f6a3395</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_ws_operation_edb6b810c5df4d33879124fc3f6a3395</sys_update_name>
+    <active>true</active>
+    <consumes>application/json,application/xml,text/xml</consumes>
+    <consumes_customized>false</consumes_customized>
+    <default_operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/auth</default_operation_uri>
+    <enforce_acl>064a8e03949c49f88bb8321ee55fd0bb</enforce_acl>
+    <http_method>POST</http_method>
+    <name>/auth</name>
+    <operation_script><![CDATA[(function process(request, response) {
+    const body = request.body ? request.body.data : {};
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+    const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+    const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+    
+    try {
+        const code = body.code;
+        const connectionId = body.connectionId;
+        
+        if (!code || !connectionId) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'code or connectionId is missing'
+            }));
+            return;
+        }
+
+        const connectionResult = connectionService.getConnectionById(connectionId);
+        if (!connectionResult.success) {
+            response.setStatus(404);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: connectionResult.error || 'Connection not found'
+            }));
+            return;
+        }
+
+        const connection = connectionResult.connection;
+
+        const tokenResult = oauthService.exchangeCodeForToken({
+            code,
+            clientId: connection.client_id,
+            clientSecret: connection.client_secret,
+            redirectUri: connection.redirect_uri
+        });
+        if (!tokenResult.success) {
+            response.setStatus(500);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: tokenResult.error || 'Failed to exchange code for token'
+            }));
+            return;
+        }
+
+        const tokenData = tokenResult.token;
+        const accessTokenExpiresAt = oauthService.calculateAccessTokenExpiresAt(tokenData.issued_at);
+
+        const connectionData = {
+            client_id: connection.client_id,
+            client_secret: connection.client_secret,
+            redirect_uri: connection.redirect_uri,
+            access_token: tokenData.access_token,
+            refresh_token: tokenData.refresh_token,
+            salesforce_user_id: tokenData.id || null,
+            access_token_expires_at: accessTokenExpiresAt,
+            instance_url: tokenData.instance_url
+        };
+
+        const saveResult = connectionService.saveConnection(connectionData);
+        if (!saveResult.success) {
+            response.setStatus(500);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Failed to save connection: ' + (saveResult.error || 'Unknown error')
+            }));
+            return;
+        }
+
+        response.setStatus(200);
+        writer.writeString(JSON.stringify({
+            access_token: tokenData.access_token,
+        }));
+    } catch (error) {
+        gs.error('Error in Salesforce auth POST handler: ' + error.message + '\nStack: ' + error.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + error.message
+        }));
+    }
+    
+})(request, response);
+]]></operation_script>
+    <operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/auth</operation_uri>
+    <produces>application/json,application/xml,text/xml</produces>
+    <produces_customized>false</produces_customized>
+    <relative_path>/auth</relative_path>
+    <request_example/>
+    <requires_acl_authorization>true</requires_acl_authorization>
+    <requires_authentication>true</requires_authentication>
+    <requires_snc_internal_role>true</requires_snc_internal_role>
+    <short_description>Handle Salesforce authentication</short_description>
+    <sys_policy/>
+    <web_service_definition>25cee077e5594db7b73b41a697f46061</web_service_definition>
+    <web_service_version/>
+  </sys_ws_operation>
+</record_update>

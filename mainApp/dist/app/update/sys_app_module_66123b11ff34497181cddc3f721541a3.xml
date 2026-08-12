@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<record_update table="sys_app_module">
+  <sys_app_module action="INSERT_OR_UPDATE">
+    <sys_id>66123b11ff34497181cddc3f721541a3</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_app_module_66123b11ff34497181cddc3f721541a3</sys_update_name>
+    <active>true</active>
+    <application>a3259015321b4707bb30f9fe10983f57</application>
+    <link_type>DIRECT</link_type>
+    <order>110</order>
+    <query>/sp?id=peeklogic_salesforce_connector_plus&amp;tab=support</query>
+    <title>Contact Support</title>
+    <window_name>_blank</window_name>
+  </sys_app_module>
+</record_update>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<record_update table="ua_table_licensing_config">
+  <ua_table_licensing_config action="DELETE">
+    <sys_id>057345545560436f86c658a15e8e6cea</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>ua_table_licensing_config_057345545560436f86c658a15e8e6cea</sys_update_name>
+    <name>x_peekl_salesfor_0_salesforce_record_link</name>
+  </ua_table_licensing_config>
+</record_update>

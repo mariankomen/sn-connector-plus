@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<record_update table="sys_module">
+  <sys_module action="INSERT_OR_UPDATE">
+    <sys_id>b94c2f5ef67b40dbb81d9018a99df69c</sys_id>
+    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_update_name>sys_module_b94c2f5ef67b40dbb81d9018a99df69c</sys_update_name>
+    <content><![CDATA[(function process(request, response) {
+    const body = request.body ? request.body.data : {};
+    const writer = response.getStreamWriter();
+    response.setContentType('application/json');
+
+    const clientId = body.clientId;
+    const clientSecret = body.clientSecret;
+    const redirectUri = body.redirectUri;
+    if (!clientId || !clientSecret || !redirectUri) {
+        response.setStatus(400);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'clientId, clientSecret and redirectUri are required'
+        }));
+        return;
+    }
+
+    try {
+        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const result = connectionService.saveConnection({
+            client_id: clientId,
+            client_secret: clientSecret,
+            redirect_uri: redirectUri
+        });
+        if (!result.success) {
+            response.setStatus(500);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: result.error || 'Failed to initialize connection'
+            }));
+            return;
+        }
+
+        response.setStatus(200);
+        writer.writeString(JSON.stringify({
+            success: true,
+            connectionId: result.connection_id
+        }));
+    } catch (error) {
+        gs.error('Error in Salesforce connection init handler: ' + error.message + '\nStack: ' + error.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + error.message
+        }));
+    }
+})(request, response);
+
+]]></content>
+    <external_source>false</external_source>
+    <path>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/connection-init-post.js</path>
+    <sys_name>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/connection-init-post.js</sys_name>
+  </sys_module>
+</record_update>

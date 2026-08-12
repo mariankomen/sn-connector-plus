@@ -1,0 +1,171 @@
+(function process(request, response) {
+    response.setContentType('application/json');
+    const writer = response.getStreamWriter();
+
+    function safeJsonParse(s) {
+        try { return JSON.parse(s); } catch (e) { return null; }
+    }
+
+    function getParam(name) {
+        try {
+            if (request && request.queryParams) {
+                if (request.queryParams[name] !== undefined && request.queryParams[name] !== null && request.queryParams[name] !== '') {
+                    return '' + request.queryParams[name];
+                }
+            }
+            if (request && typeof request.getParameter === 'function') {
+                const v2 = request.getParameter(name);
+                if (v2 !== null && v2 !== undefined && v2 !== '') return '' + v2;
+            }
+        } catch (e) { }
+        return null;
+    }
+
+    try {
+        const recordId = getParam('record_id') || getParam('recordId');
+        const nextPageUrl = getParam('nextPageUrl') || getParam('nextPageUrl');
+        
+        if (!recordId) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Missing required parameter: record_id'
+            }));
+            return;
+        }
+
+
+        
+        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const lookup = connectionService.getCurrentUserConnection();
+        if (!lookup || !lookup.success) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: (lookup && lookup.error) ? lookup.error : 'No active connection found'
+            }));
+            return;
+        }
+
+        
+        const details = connectionService.getConnectionDetails(lookup.connection_id);
+        if (!details || !details.success || !details.connection) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: (details && details.error) ? details.error : 'Connection details not found'
+            }));
+            return;
+        }
+
+        const connection = details.connection;
+        if (!connection.instance_url) {
+            response.setStatus(400);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Salesforce instance_url is missing on the connection'
+            }));
+            return;
+        }
+
+        
+        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const accessToken = oauthService.ensureValidAccessToken({
+            connection: connection,
+            connectionService: connectionService
+        });
+        
+        if (!accessToken) {
+            response.setStatus(401);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: 'Unable to obtain Salesforce access token (re-authorize the connection)'
+            }));
+            return;
+        }
+
+        var instanceUrl = connection.instance_url.replace(/\/+$/, '');
+
+       
+        var endpoint;
+        
+        if (nextPageUrl && nextPageUrl.startsWith('http')) {
+            
+            endpoint = nextPageUrl;
+        } else {
+           
+            endpoint = instanceUrl + '/services/data/v56.0/chatter/feeds/record/' + recordId + '/feed-elements?recentCommentCount=25&pageSize=100';
+            
+            
+            if (nextPageUrl && nextPageUrl.trim() !== '') {
+             
+                var cleanToken = nextPageUrl.replace(/^[&?]/, '');
+                if (!cleanToken.startsWith('page=')) {
+                    endpoint = endpoint + '&page=' + encodeURIComponent(cleanToken);
+                } else {
+                    endpoint = endpoint + '&' + cleanToken;
+                }
+            }
+        }
+
+        var restMessage = new sn_ws.RESTMessageV2();
+        restMessage.setEndpoint(endpoint);
+        restMessage.setHttpMethod('GET');
+        restMessage.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+        restMessage.setRequestHeader('Accept', 'application/json');
+
+        var restResponse = restMessage.execute();
+        var httpStatus = restResponse.getStatusCode();
+        var responseBody = restResponse.getBody();
+
+        if (httpStatus >= 200 && httpStatus < 300) {
+            var responseData = safeJsonParse(responseBody);
+            if (!responseData) {
+                responseData = { elements: [] };
+            }
+            
+           
+            var nextPageToken = null;
+            var currentPageUrl = null;
+            
+            if (responseData.nextPageToken) {
+                nextPageToken = responseData.nextPageToken;
+            } else if (responseData.currentPageUrl) {
+                currentPageUrl = responseData.currentPageUrl;
+            }
+            
+           
+            var result = {
+                success: true,
+                elements: responseData.elements || [],
+                nextPageToken: nextPageToken,
+                currentPageUrl: currentPageUrl,
+                instanceUrl: instanceUrl
+            };
+            
+            response.setStatus(httpStatus);
+            writer.writeString(JSON.stringify(result));
+        } else {
+            var errorData = safeJsonParse(responseBody);
+            if (!errorData) {
+                errorData = { error: responseBody };
+            }
+
+            gs.error('Salesforce UI API record fetch failed. Status=' + httpStatus + ' Body=' + responseBody);
+            response.setStatus(httpStatus);
+            writer.writeString(JSON.stringify({
+                success: false,
+                error: errorData.message || errorData[0]?.message || errorData.error || 'Salesforce API error',
+                details: errorData
+            }));
+        }
+
+    } catch (err) {
+        gs.error('Error in Salesforce record details handler: ' + err.message + '\nStack: ' + err.stack);
+        response.setStatus(500);
+        writer.writeString(JSON.stringify({
+            success: false,
+            error: 'Internal server error: ' + (err.message || String(err))
+        }));
+    }
+})(request, response);
