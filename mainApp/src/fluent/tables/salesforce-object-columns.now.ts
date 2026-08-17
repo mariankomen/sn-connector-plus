@@ -1,13 +1,13 @@
 import '@servicenow/sdk/global'
 import { Table, StringColumn, BooleanColumn, IntegerColumn, ReferenceColumn } from '@servicenow/sdk/core'
 
-export const x_peekl_salesfor_0_salesforce_object_columns = Table({
-    name: 'x_peekl_salesfor_0_salesforce_object_columns',
+export const x_1955226_peeklo_1_salesforce_object_columns = Table({
+    name: 'x_1955226_peeklo_1_salesforce_object_columns',
     label: 'Salesforce Object Columns',
     schema: {
         object_config: ReferenceColumn({
             label: 'Object Configuration',
-            referenceTable: 'x_peekl_salesfor_0_salesforce_object_config',
+            referenceTable: 'x_1955226_peeklo_1_salesforce_object_config',
             referenceKey: 'sys_id',
             mandatory: true,
         }),

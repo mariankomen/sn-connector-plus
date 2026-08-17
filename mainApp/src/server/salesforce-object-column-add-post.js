@@ -98,7 +98,7 @@
             }
 
            
-            var existingGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+            var existingGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_columns');
             existingGr.addQuery('object_config', objConfigId);
             existingGr.query();
 
@@ -118,7 +118,7 @@
             for (var d = 0; d < existingColumnsToDelete.length; d++) {
                 var colToDelete = existingColumnsToDelete[d];
                 try {
-                    var deleteGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+                    var deleteGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_columns');
                     deleteGr.addQuery('object_config', objConfigId);
                     deleteGr.addQuery('column_name', colToDelete.column_name);
                     deleteGr.setWorkflow(false);
@@ -146,7 +146,7 @@
                 };
 
                
-                var checkGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+                var checkGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_columns');
                 checkGr.addQuery('object_config', item.object_config);
                 checkGr.addQuery('column_name', item.column_name);
                 checkGr.query();
@@ -162,7 +162,7 @@
                         sysId = gr.getUniqueValue();
                     } else {
                        
-                        gr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+                        gr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_columns');
                         gr.initialize();
                     }
 

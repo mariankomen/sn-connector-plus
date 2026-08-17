@@ -106,7 +106,7 @@ const Feeds = ({ sf_record_id }: IRecordModalProps) => {
 
     const fetchFeeds = useCallback(async (recordId: string, nextPageUrl: string = "") => {
         try {
-            const url = `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/get-feed?record_id=${recordId}${nextPageUrl ? `&nextPageUrl=${encodeURIComponent(nextPageUrl)}` : ""}`;
+            const url = `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/get-feed?record_id=${recordId}${nextPageUrl ? `&nextPageUrl=${encodeURIComponent(nextPageUrl)}` : ""}`;
             
             const response = await fetch(url, {
                 headers: {

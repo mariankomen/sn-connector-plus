@@ -170,7 +170,7 @@ SalesforceConnectionService.prototype = {
             return null;
         }
 
-        var connectionGr = new GlideRecordSecure('x_peekl_salesfor_0_salesforce_connection');
+        var connectionGr = new GlideRecordSecure('x_1955226_peeklo_1_salesforce_connection');
         if (!connectionGr.get(connectionId)) {
             return null;
         }
@@ -183,7 +183,7 @@ SalesforceConnectionService.prototype = {
     },
 
     _getLatestConnectionForUser: function (userId) {
-        var connectionGr = new GlideRecordSecure('x_peekl_salesfor_0_salesforce_connection');
+        var connectionGr = new GlideRecordSecure('x_1955226_peeklo_1_salesforce_connection');
         connectionGr.addQuery('created_by', userId);
         connectionGr.orderByDesc('sys_created_on');
         connectionGr.setLimit(1);
@@ -197,11 +197,11 @@ SalesforceConnectionService.prototype = {
     },
 
     _deleteDependentRecords: function (connectionId) {
-        var syncGr = new GlideRecordSecure('x_peekl_salesfor_0_sync_config');
+        var syncGr = new GlideRecordSecure('x_1955226_peeklo_1_sync_config');
         syncGr.addQuery('connection_ref', connectionId);
         syncGr.deleteMultiple();
 
-        var taskGr = new GlideRecordSecure('x_peekl_salesfor_0_task_type_config');
+        var taskGr = new GlideRecordSecure('x_1955226_peeklo_1_task_type_config');
         taskGr.addQuery('connection_id', connectionId);
         taskGr.deleteMultiple();
     },
@@ -212,7 +212,7 @@ SalesforceConnectionService.prototype = {
             return existing;
         }
 
-        var connectionGr = new GlideRecordSecure('x_peekl_salesfor_0_salesforce_connection');
+        var connectionGr = new GlideRecordSecure('x_1955226_peeklo_1_salesforce_connection');
         connectionGr.initialize();
         connectionGr.setValue('created_by', userId);
         return connectionGr;

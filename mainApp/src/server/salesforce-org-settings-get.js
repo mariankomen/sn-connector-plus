@@ -41,7 +41,7 @@
         AND pl_servicenow__isChecked__c = true
         LIMIT 1
         `;
-        const salesforceObjectService = new x_peekl_salesfor_0.SalesforceObjectService();
+        const salesforceObjectService = new x_1955226_peeklo_1.SalesforceObjectService();
         const linkedRecordsList = salesforceObjectService.query(query);
 
         response.setStatus(200);

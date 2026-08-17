@@ -4,7 +4,7 @@ SalesforceObjectService.prototype = {
     initialize: function () {},
 
     query: function(queryString){
-        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const connectionService = new x_1955226_peeklo_1.SalesforceConnectionService();
         const connectionLookup = connectionService.getCurrentUserConnection();
         if (!connectionLookup || !connectionLookup.success) {
             gs.error('[Salesforce Object Service]: connection lookup failed - ' + (connectionLookup ? connectionLookup.error : 'connectionLookup is null'));
@@ -28,7 +28,7 @@ SalesforceObjectService.prototype = {
             return false;
         }
         
-        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const oauthService = new x_1955226_peeklo_1.SalesforceOAuthService();
         const accessToken = oauthService.ensureValidAccessToken({
             connection: connection,
             connectionService: connectionService

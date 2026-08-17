@@ -5,9 +5,28 @@ import './ConnectionTab.css'
 import Button from './ui/Button'
 
 const DEFAULT_SF_LOGIN_URL = 'https://login.salesforce.com/services/oauth2'
-const apiBaseUrl = '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio'
+const apiBaseUrl = '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio'
 
 const userToken = () => (window as Window & { g_ck?: string }).g_ck || ''
+
+const base64UrlEncode = (bytes: Uint8Array) => {
+    let binary = ''
+    for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i])
+    }
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+const generateCodeVerifier = () => {
+    const randomBytes = new Uint8Array(32)
+    crypto.getRandomValues(randomBytes)
+    return base64UrlEncode(randomBytes)
+}
+
+const generateCodeChallenge = async (verifier: string) => {
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))
+    return base64UrlEncode(new Uint8Array(digest))
+}
 
 export type ConnectionTabProps = {
     isAuthenticated: boolean
@@ -69,11 +88,17 @@ export default function ConnectionTab({
             return
         }
 
+        // Salesforce now requires PKCE for the authorization code flow
+        const codeVerifier = generateCodeVerifier()
+        const codeChallenge = await generateCodeChallenge(codeVerifier)
+        localStorage.setItem('salesforce_code_verifier', codeVerifier)
+
         const params = new URLSearchParams({
             response_type: 'code',
             client_id: credentials.client_id,
-            client_secret: credentials.client_secret,
             redirect_uri: credentials.redirect_uri,
+            code_challenge: codeChallenge,
+            code_challenge_method: 'S256',
             prompt: 'login',
         })
 

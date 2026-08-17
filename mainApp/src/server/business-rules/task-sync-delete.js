@@ -7,7 +7,7 @@
 
     var connectionId = '';
     try {
-        var connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        var connectionService = new x_1955226_peeklo_1.SalesforceConnectionService();
         var connectionLookup = connectionService.getCurrentUserConnection();
         if (connectionLookup && connectionLookup.success) {
             connectionId = connectionLookup.connection_id;
@@ -19,7 +19,7 @@
         return;
     }
 
-    var taskSyncService = new x_peekl_salesfor_0.TaskSyncService();
+    var taskSyncService = new x_1955226_peeklo_1.TaskSyncService();
     if (!taskSyncService.isSyncEnabled(connectionId, current.getTableName())) {
         return;
     }
@@ -33,6 +33,6 @@
         }
     };
 
-    var queueService = new x_peekl_salesfor_0.SyncEventQueueService();
+    var queueService = new x_1955226_peeklo_1.SyncEventQueueService();
     queueService.enqueuePayload(payload);
 })(current, previous);

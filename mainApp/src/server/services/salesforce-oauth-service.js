@@ -12,11 +12,16 @@ SalesforceOAuthService.prototype = {
             request.setHttpMethod('POST');
             request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-            const body = 'grant_type=authorization_code' +
+            let body = 'grant_type=authorization_code' +
                 '&client_id=' + encodeURIComponent(params.clientId) +
                 '&client_secret=' + encodeURIComponent(params.clientSecret) +
                 '&redirect_uri=' + encodeURIComponent(params.redirectUri) +
                 '&code=' + encodeURIComponent(params.code);
+
+            // PKCE: Salesforce requires the code_verifier matching the code_challenge sent to /authorize
+            if (params.codeVerifier) {
+                body += '&code_verifier=' + encodeURIComponent(params.codeVerifier);
+            }
 
             request.setRequestBody(body);
 

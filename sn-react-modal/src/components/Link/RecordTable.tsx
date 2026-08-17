@@ -72,7 +72,7 @@ const RecordTable = ({ servicenowTable, servicenowSysId, onRecordLinked }: Recor
         const fetchConfiguredObjects = async () => {
             try {
                 const response = await fetch(
-                    '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/objects',
+                    '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/objects',
                     {
                         headers: {
                             'Accept': 'application/json',
@@ -136,7 +136,7 @@ const RecordTable = ({ servicenowTable, servicenowSysId, onRecordLinked }: Recor
                 requestBody.filters = { [selectedObject.name]: whereClause };
             }
             const response = await fetch(
-                '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/search/all',
+                '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/search/all',
                 {
                     method: 'POST',
                     headers: {
@@ -274,7 +274,7 @@ const RecordTable = ({ servicenowTable, servicenowSysId, onRecordLinked }: Recor
 
         try {
             const response = await fetch(
-                '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/sync',
+                '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/sync',
                 {
                     method: 'POST',
                     headers: {

@@ -69,7 +69,7 @@ const ExistingLinksTable = ({ servicenowTable, servicenowSysId, onLinkDeleted }:
             }
 
             const response = await fetch(
-                `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/record-link?${params.toString()}`,
+                `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/record-link?${params.toString()}`,
                 {
                     headers: {
                         'Accept': 'application/json',
@@ -114,7 +114,7 @@ const ExistingLinksTable = ({ servicenowTable, servicenowSysId, onLinkDeleted }:
 
         try {
             const response = await fetch(
-                '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/record-link/delete',
+                '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/record-link/delete',
                 {
                     method: 'POST',
                     headers: {

@@ -2,12 +2,13 @@
     const body = request.body ? request.body.data : {};
     response.setContentType('application/json');
     const writer = response.getStreamWriter();
-    const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
-    const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+    const oauthService = new x_1955226_peeklo_1.SalesforceOAuthService();
+    const connectionService = new x_1955226_peeklo_1.SalesforceConnectionService();
     
     try {
         const code = body.code;
         const connectionId = body.connectionId;
+        const codeVerifier = body.codeVerifier;
         
         if (!code || !connectionId) {
             response.setStatus(400);
@@ -32,6 +33,7 @@
 
         const tokenResult = oauthService.exchangeCodeForToken({
             code,
+            codeVerifier,
             clientId: connection.client_id,
             clientSecret: connection.client_secret,
             redirectUri: connection.redirect_uri

@@ -4,7 +4,7 @@ import './OAuthCallback.css';
 import Button from './ui/Button';
 import LoadingSpinner from './ui/LoadingSpinner.jsx';
 
-const baseUrl = "/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio";
+const baseUrl = "/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio";
 const APP_HOME_URL = '/sp?id=peeklogic_salesforce_connector_plus';
 
 
@@ -13,6 +13,7 @@ export default function OAuthCallback({ code }) {
     const [message, setMessage] = useState('Processing authorization...');
 
     const connectionId = localStorage.getItem("salesforce_connection_id");
+    const codeVerifier = localStorage.getItem("salesforce_code_verifier");
 
     useEffect(() => {
         handleCallback();
@@ -28,7 +29,8 @@ export default function OAuthCallback({ code }) {
             
             const response = await axios.post(`${baseUrl}/auth`, {
                 code,
-                connectionId
+                connectionId,
+                codeVerifier
             }, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -37,10 +39,11 @@ export default function OAuthCallback({ code }) {
                 }
             });
             if (response.data.access_token) {
+                localStorage.removeItem("salesforce_code_verifier");
                 setStatus('success');
                 setMessage('✅ Successfully connected to Salesforce! Redirecting...');
-                
-               
+
+
                 window.location.href = APP_HOME_URL;
             } else {
                 const errorText = response.data.error || response.data.message || 'Failed to complete authorization';

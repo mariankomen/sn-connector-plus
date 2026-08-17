@@ -2,12 +2,12 @@
 <record_update table="sys_ws_operation">
   <sys_ws_operation action="INSERT_OR_UPDATE">
     <sys_id>5a85715ac7c843cf8b4b9a71f19fbf3d</sys_id>
-    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_scope display_value="x_1955226_peeklo_1">e94a8651c36147905bed770d050131e5</sys_scope>
     <sys_update_name>sys_ws_operation_5a85715ac7c843cf8b4b9a71f19fbf3d</sys_update_name>
     <active>true</active>
     <consumes>application/json,application/xml,text/xml</consumes>
     <consumes_customized>false</consumes_customized>
-    <default_operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/related-objects-columns-select</default_operation_uri>
+    <default_operation_uri>/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/related-objects-columns-select</default_operation_uri>
     <enforce_acl>064a8e03949c49f88bb8321ee55fd0bb</enforce_acl>
     <http_method>POST</http_method>
     <name>/salesforce/related-objects-columns-select</name>
@@ -126,7 +126,7 @@
         
         if (data.length === 0 && objectNameFromQuery && relationshipNameFromQuery) {
             
-            var objConfigGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+            var objConfigGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_config');
             objConfigGr.addQuery('sf_object_name', objectNameFromQuery);
             objConfigGr.query();
             
@@ -142,7 +142,7 @@
             var objectConfigSysId = objConfigGr.getUniqueValue();
 
             
-            var selRelGr = new GlideRecord('x_peekl_salesfor_0_salesforce_selected_related_objects');
+            var selRelGr = new GlideRecord('x_1955226_peeklo_1_salesforce_selected_related_objects');
             selRelGr.addQuery('object_config', objectConfigSysId);
             selRelGr.addQuery('relationship_name', relationshipNameFromQuery);
             selRelGr.query();
@@ -225,7 +225,7 @@
                     }
 
                     
-                    var objConfigGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+                    var objConfigGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_config');
                     objConfigGr.addQuery('sf_object_name', objectName);
                     objConfigGr.query();
                     
@@ -241,7 +241,7 @@
                     var objectConfigSysId = objConfigGr.getUniqueValue();
 
                     
-                    var selRelGr = new GlideRecord('x_peekl_salesfor_0_salesforce_selected_related_objects');
+                    var selRelGr = new GlideRecord('x_1955226_peeklo_1_salesforce_selected_related_objects');
                     selRelGr.addQuery('object_config', objectConfigSysId);
                     selRelGr.addQuery('relationship_name', relationshipName);
                     selRelGr.query();
@@ -289,7 +289,7 @@
             }
 
             
-            var existingGr = new GlideRecord('x_peekl_salesfor_0_salesforce_related_object_columns');
+            var existingGr = new GlideRecord('x_1955226_peeklo_1_salesforce_related_object_columns');
             existingGr.addQuery('selected_related_object', selRelObjId);
             existingGr.query();
 
@@ -309,7 +309,7 @@
             for (var d = 0; d < existingColumnsToDelete.length; d++) {
                 var colToDelete = existingColumnsToDelete[d];
                 try {
-                    var deleteGr = new GlideRecord('x_peekl_salesfor_0_salesforce_related_object_columns');
+                    var deleteGr = new GlideRecord('x_1955226_peeklo_1_salesforce_related_object_columns');
                     deleteGr.addQuery('selected_related_object', selRelObjId);
                     deleteGr.addQuery('column_name', colToDelete.column_name);
                     deleteGr.setWorkflow(false);
@@ -337,7 +337,7 @@
                 };
 
                 
-                var checkGr = new GlideRecord('x_peekl_salesfor_0_salesforce_related_object_columns');
+                var checkGr = new GlideRecord('x_1955226_peeklo_1_salesforce_related_object_columns');
                 checkGr.addQuery('selected_related_object', item.selected_related_object);
                 checkGr.addQuery('column_name', item.column_name);
                 checkGr.query();
@@ -353,7 +353,7 @@
                         sysId = gr.getUniqueValue();
                     } else {
                         
-                        gr = new GlideRecord('x_peekl_salesfor_0_salesforce_related_object_columns');
+                        gr = new GlideRecord('x_1955226_peeklo_1_salesforce_related_object_columns');
                         gr.initialize();
                     }
 
@@ -435,7 +435,7 @@
     }
 })(request, response);
 ]]></operation_script>
-    <operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/related-objects-columns-select</operation_uri>
+    <operation_uri>/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/related-objects-columns-select</operation_uri>
     <produces>application/json,application/xml,text/xml</produces>
     <produces_customized>false</produces_customized>
     <relative_path>/salesforce/related-objects-columns-select</relative_path>

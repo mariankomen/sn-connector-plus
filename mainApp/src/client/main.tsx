@@ -10,7 +10,7 @@ const mountReactApp = () => {
         return
     }
 
-    const win = window as Window & Record<string, ReturnType<typeof ReactDOM.createRoot> | undefined>
+    const win = window as unknown as Window & Record<string, ReturnType<typeof ReactDOM.createRoot> | undefined>
     if (win[ROOT_KEY]) {
         return
     }

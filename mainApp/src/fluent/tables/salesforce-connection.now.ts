@@ -1,8 +1,8 @@
 import '@servicenow/sdk/global'
 import { Table, StringColumn, DateTimeColumn, Password2Column } from '@servicenow/sdk/core'
 
-export const x_peekl_salesfor_0_salesforce_connection = Table({
-    name: 'x_peekl_salesfor_0_salesforce_connection',
+export const x_1955226_peeklo_1_salesforce_connection = Table({
+    name: 'x_1955226_peeklo_1_salesforce_connection',
     label: 'Salesforce Connection',
     schema: {
         client_id: Password2Column({

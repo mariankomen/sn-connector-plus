@@ -1,5 +1,5 @@
 (function executeRule(current, previous) {
-    var taskSyncService = new x_peekl_salesfor_0.TaskSyncService();
+    var taskSyncService = new x_1955226_peeklo_1.TaskSyncService();
     taskSyncService.handleTaskSync('create', current);
 })(current, previous);
 

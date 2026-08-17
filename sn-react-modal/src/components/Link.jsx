@@ -29,7 +29,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
       try {
        
         const sobjectsResponse = await fetch(
-          '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/sobjects',
+          '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/sobjects',
           {
             headers: {
               'Accept': 'application/json',
@@ -46,7 +46,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
         const sobjectsData = await sobjectsResponse.json();
         setAvailableObjects(sobjectsData.sobjects || []);
         const configResponse = await fetch(
-          '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/objects',
+          '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/objects',
           {
             headers: {
               'Accept': 'application/json',
@@ -135,7 +135,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
         });
 
         const addResponse = await fetch(
-          '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/objects',
+          '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/objects',
           {
             method: 'POST',
             headers: {
@@ -177,7 +177,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
         if (objectsToDelete.length > 0) {
           const deleteResponse = await fetch(
-            '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/objects/delete',
+            '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/objects/delete',
             {
               method: 'POST',
               headers: {
@@ -338,7 +338,7 @@ function LinkSalesforceRecord({ onRecordLinked, servicenowTable, servicenowSysId
 
     try {
       const response = await fetch(
-        '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/objects',
+        '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/objects',
         {
           headers: {
             'Accept': 'application/json',

@@ -71,7 +71,7 @@ const QueryFilters = ({
 
         try {
             const response = await fetch(
-                `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/object/describe?object_name=${encodeURIComponent(objectName)}`,
+                `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/object/describe?object_name=${encodeURIComponent(objectName)}`,
                 {
                     headers: {
                         'Accept': 'application/json',

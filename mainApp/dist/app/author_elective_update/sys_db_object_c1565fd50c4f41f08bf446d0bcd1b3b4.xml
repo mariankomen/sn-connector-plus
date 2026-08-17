@@ -2,8 +2,8 @@
 <record_update table="sys_db_object">
   <sys_db_object action="DELETE">
     <sys_id>c1565fd50c4f41f08bf446d0bcd1b3b4</sys_id>
-    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_scope display_value="x_1955226_peeklo_1">e94a8651c36147905bed770d050131e5</sys_scope>
     <sys_update_name>sys_db_object_c1565fd50c4f41f08bf446d0bcd1b3b4</sys_update_name>
-    <name>x_peekl_salesfor_0_modal_bundle_storage</name>
+    <name>x_1955226_peeklo_1_modal_bundle_storage</name>
   </sys_db_object>
 </record_update>

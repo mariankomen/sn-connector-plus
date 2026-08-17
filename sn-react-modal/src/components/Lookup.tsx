@@ -87,7 +87,7 @@ const Lookup: React.FC<LookupProps> = ({ field, objectName, value, onChange, req
     try {
       const uri = `/${objectName}/${field.name}${searchParams}`;
       const response = await fetch(
-        `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/lookup-suggestions?uri=${encodeURIComponent(uri)}`,
+        `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/lookup-suggestions?uri=${encodeURIComponent(uri)}`,
         {
           headers: {
             'Accept': 'application/json',

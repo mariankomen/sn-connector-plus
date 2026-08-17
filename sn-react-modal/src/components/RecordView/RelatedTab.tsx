@@ -68,7 +68,7 @@ const RelatedTab = ({ sf_object_type, sf_record_id }: IRecordModalProps) => {
             setLoading(true);
             setError(null);
 
-            const url = `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/related-records?object_name=${encodeURIComponent(objectName)}&record_id=${encodeURIComponent(recordId)}`;
+            const url = `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/related-records?object_name=${encodeURIComponent(objectName)}&record_id=${encodeURIComponent(recordId)}`;
             
             const response = await fetch(url, {
                 headers: {

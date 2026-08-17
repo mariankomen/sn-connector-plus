@@ -3,7 +3,7 @@
         return;
     }
 
-    var queueService = new x_peekl_salesfor_0.SyncEventQueueService();
+    var queueService = new x_1955226_peeklo_1.SyncEventQueueService();
     queueService.processRetry(current);
 })(current, previous);
 

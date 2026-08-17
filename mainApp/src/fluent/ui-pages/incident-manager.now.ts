@@ -23,7 +23,7 @@ Acl({
 Acl({
     $id: Now.ID['incident_manager_scoped_ui_page_read_acl'],
     type: 'ui_page',
-    name: 'x_peekl_salesfor_0_incident_manager',
+    name: 'x_1955226_peeklo_1_incident_manager',
     operation: 'read',
     roles: aclRoles,
 })
@@ -31,7 +31,7 @@ Acl({
 Acl({
     $id: Now.ID['incident_manager_scoped_ui_page_execute_acl'],
     type: 'ui_page',
-    name: 'x_peekl_salesfor_0_incident_manager',
+    name: 'x_1955226_peeklo_1_incident_manager',
     operation: 'execute',
     roles: aclRoles,
 })
@@ -39,7 +39,7 @@ Acl({
 Acl({
     $id: Now.ID['incident_manager_endpoint_ui_page_read_acl'],
     type: 'ui_page',
-    name: 'x_peekl_salesfor_0_incident_manager.do',
+    name: 'x_1955226_peeklo_1_incident_manager.do',
     operation: 'read',
     roles: aclRoles,
 })
@@ -47,7 +47,7 @@ Acl({
 Acl({
     $id: Now.ID['incident_manager_endpoint_ui_page_execute_acl'],
     type: 'ui_page',
-    name: 'x_peekl_salesfor_0_incident_manager.do',
+    name: 'x_1955226_peeklo_1_incident_manager.do',
     operation: 'execute',
     roles: aclRoles,
 })
@@ -55,7 +55,7 @@ Acl({
 Acl({
     $id: Now.ID['servicenow_page_ui_page_read_acl'],
     type: 'ui_page',
-    name: 'x_peekl_salesfor_0_ServiceNowPage',
+    name: 'x_1955226_peeklo_1_ServiceNowPage',
     operation: 'read',
     roles: aclRoles,
 })
@@ -63,7 +63,7 @@ Acl({
 Acl({
     $id: Now.ID['servicenow_page_ui_page_execute_acl'],
     type: 'ui_page',
-    name: 'x_peekl_salesfor_0_ServiceNowPage',
+    name: 'x_1955226_peeklo_1_ServiceNowPage',
     operation: 'execute',
     roles: aclRoles,
 })
@@ -71,7 +71,7 @@ Acl({
 Acl({
     $id: Now.ID['servicenow_page_endpoint_ui_page_read_acl'],
     type: 'ui_page',
-    name: 'x_peekl_salesfor_0_ServiceNowPage.do',
+    name: 'x_1955226_peeklo_1_ServiceNowPage.do',
     operation: 'read',
     roles: aclRoles,
 })
@@ -79,18 +79,18 @@ Acl({
 Acl({
     $id: Now.ID['servicenow_page_endpoint_ui_page_execute_acl'],
     type: 'ui_page',
-    name: 'x_peekl_salesfor_0_ServiceNowPage.do',
+    name: 'x_1955226_peeklo_1_ServiceNowPage.do',
     operation: 'execute',
     roles: aclRoles,
 })
 
 UiPage({
     $id: Now.ID['servicenow-page'],
-    endpoint: 'x_peekl_salesfor_0_ServiceNowPage.do',
+    endpoint: 'x_1955226_peeklo_1_ServiceNowPage.do',
     description: 'Host page for the Salesforce Connector React modal, opened via GlideModal from the Salesforce Connector UI Action on task',
     html: `<div data-peeklo-modal-root="true">Loading…</div>`,
     clientScript: `(function () {
-    const API_BASE_URL = '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio';
+    const API_BASE_URL = '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio';
 
     function mountIfReady() {
         var root = document.querySelector('[data-peeklo-modal-root="true"]');

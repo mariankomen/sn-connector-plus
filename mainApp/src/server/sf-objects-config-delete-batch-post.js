@@ -70,7 +70,7 @@
             }
 
             
-            var objectConfigGr = new GlideRecordSecure('x_peekl_salesfor_0_salesforce_object_config');
+            var objectConfigGr = new GlideRecordSecure('x_1955226_peeklo_1_salesforce_object_config');
             var found = false;
 
             if (sysId) {
@@ -81,7 +81,7 @@
             }
 
             if (!found && objectName) {
-                objectConfigGr = new GlideRecordSecure('x_peekl_salesfor_0_salesforce_object_config');
+                objectConfigGr = new GlideRecordSecure('x_1955226_peeklo_1_salesforce_object_config');
                 objectConfigGr.addQuery('sf_object_name', objectName);
                 objectConfigGr.query();
                 found = objectConfigGr.next();

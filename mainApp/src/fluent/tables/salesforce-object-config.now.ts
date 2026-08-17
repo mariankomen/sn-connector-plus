@@ -2,8 +2,8 @@ import '@servicenow/sdk/global'
 import { Table, StringColumn, BooleanColumn, IntegerColumn } from '@servicenow/sdk/core'
 
 
-export const x_peekl_salesfor_0_salesforce_object_config = Table({
-    name: 'x_peekl_salesfor_0_salesforce_object_config',
+export const x_1955226_peeklo_1_salesforce_object_config = Table({
+    name: 'x_1955226_peeklo_1_salesforce_object_config',
     label: 'Salesforce Object Configuration',
     schema: {
         sf_object_name: StringColumn({

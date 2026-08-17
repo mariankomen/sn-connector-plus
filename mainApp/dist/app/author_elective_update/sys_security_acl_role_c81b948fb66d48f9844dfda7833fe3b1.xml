@@ -2,9 +2,9 @@
 <record_update table="sys_security_acl_role">
   <sys_security_acl_role action="DELETE">
     <sys_id>c81b948fb66d48f9844dfda7833fe3b1</sys_id>
-    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_scope display_value="x_1955226_peeklo_1">e94a8651c36147905bed770d050131e5</sys_scope>
     <sys_update_name>sys_security_acl_role_c81b948fb66d48f9844dfda7833fe3b1</sys_update_name>
     <sys_security_acl>d915af0eb2db464f95da977780e4feef</sys_security_acl>
-    <sys_user_role name="x_peekl_salesfor_0.admin">a1bc43f2c02b4f46b14fe6f9d84b0231</sys_user_role>
+    <sys_user_role name="x_1955226_peeklo_1.admin">a1bc43f2c02b4f46b14fe6f9d84b0231</sys_user_role>
   </sys_security_acl_role>
 </record_update>

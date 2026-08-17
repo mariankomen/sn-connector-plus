@@ -13,7 +13,7 @@ const salesforceIntegrationRestEndpointAcl = Acl({
 RestApi({
     $id: Now.ID['salesforce_integration_api'],
     name: 'salesforce_integration',
-    serviceId: 'x_peekl_salesfor_0_salesforce_integratio',
+    serviceId: 'x_1955226_peeklo_1_salesforce_integratio',
     shortDescription: 'API for Salesforce integration - authentication and task type configuration',
     routes: [
         {

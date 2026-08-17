@@ -2,7 +2,7 @@
 <record_update table="sys_script">
   <sys_script action="INSERT_OR_UPDATE">
     <sys_id>fc5502667bd345eb947931a9fb4c101e</sys_id>
-    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_scope display_value="x_1955226_peeklo_1">e94a8651c36147905bed770d050131e5</sys_scope>
     <sys_update_name>sys_script_fc5502667bd345eb947931a9fb4c101e</sys_update_name>
     <abort_action>false</abort_action>
     <access>package_private</access>
@@ -15,7 +15,7 @@
     <advanced>true</advanced>
     <change_fields>false</change_fields>
     <client_callable>false</client_callable>
-    <collection>x_peekl_salesfor_0_salesforce_object_config</collection>
+    <collection>x_1955226_peeklo_1_salesforce_object_config</collection>
     <condition/>
     <description>Queues cascade delete operation for child records when a Salesforce object config is deleted</description>
     <execute_function>false</execute_function>
@@ -38,14 +38,14 @@
         return;
     }
 
-    var queueService = new x_peekl_salesfor_0.SyncEventQueueService();
+    var queueService = new x_1955226_peeklo_1.SyncEventQueueService();
     var payload = {
         eventType: 'cascade_delete',
-        parentTable: 'x_peekl_salesfor_0_salesforce_object_config',
+        parentTable: 'x_1955226_peeklo_1_salesforce_object_config',
         parentSysId: sysId,
         childTables: [
-            'x_peekl_salesfor_0_salesforce_object_columns',
-            'x_peekl_salesfor_0_salesforce_selected_related_objects'
+            'x_1955226_peeklo_1_salesforce_object_columns',
+            'x_1955226_peeklo_1_salesforce_selected_related_objects'
         ]
     };
     

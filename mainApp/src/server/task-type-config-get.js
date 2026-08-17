@@ -3,7 +3,7 @@
     const writer = response.getStreamWriter();
     
     try {
-        const connectionHelper = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const connectionHelper = new x_1955226_peeklo_1.SalesforceConnectionService();
         const activeConnection = connectionHelper.getCurrentUserConnection();
         if (!activeConnection.success) {
             response.setStatus(401);
@@ -16,7 +16,7 @@
         
         const connectionId = activeConnection.connection_id;
         
-        const configGr = new GlideRecord('x_peekl_salesfor_0_task_type_config');
+        const configGr = new GlideRecord('x_1955226_peeklo_1_task_type_config');
         configGr.addQuery('connection_id', connectionId);
         configGr.orderBy('table_name');
         configGr.query();

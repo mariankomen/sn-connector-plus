@@ -42,7 +42,7 @@ const ColumnConfigure: React.FC = () => {
 
       try {
         const response = await fetch(
-          '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/objects',
+          '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/objects',
           {
             headers: {
               'Accept': 'application/json',
@@ -90,7 +90,7 @@ const ColumnConfigure: React.FC = () => {
   const fetchColumnsForObject = async (objectConfigSysId: string, objectName: string) => {
     try {
       const fieldsResponse = await fetch(
-        `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/objects/columns-get?object_name=${encodeURIComponent(objectName)}`,
+        `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/objects/columns-get?object_name=${encodeURIComponent(objectName)}`,
         {
           headers: {
             'Accept': 'application/json',
@@ -112,7 +112,7 @@ const ColumnConfigure: React.FC = () => {
       let savedColumns: string[] = [];
       try {
         const savedResponse = await fetch(
-          `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/objects/saved-columns-get?object_config=${encodeURIComponent(objectConfigSysId)}`,
+          `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/objects/saved-columns-get?object_config=${encodeURIComponent(objectConfigSysId)}`,
           {
             headers: {
               'Accept': 'application/json',
@@ -229,8 +229,8 @@ const ColumnConfigure: React.FC = () => {
 
       
       const url = colsForThisObject.length === 0
-        ? `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/objects/columns-add?object_config=${encodeURIComponent(objectConfigSysId)}`
-        : '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/objects/columns-add';
+        ? `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/objects/columns-add?object_config=${encodeURIComponent(objectConfigSysId)}`
+        : '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/objects/columns-add';
       
       const response = await fetch(url, {
         method: 'POST',

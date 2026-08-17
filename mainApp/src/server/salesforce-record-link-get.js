@@ -71,7 +71,7 @@
             return;
         }
 
-        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const connectionService = new x_1955226_peeklo_1.SalesforceConnectionService();
         const lookup = connectionService.getCurrentUserConnection();
         if (!lookup || !lookup.success) {
             response.setStatus(401);
@@ -102,7 +102,7 @@
             return;
         }
 
-        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const oauthService = new x_1955226_peeklo_1.SalesforceOAuthService();
         const accessToken = oauthService.ensureValidAccessToken({
             connection: connection,
             connectionService: connectionService
@@ -122,7 +122,7 @@
             SELECT Id, pl_servicenow__SN_Object_Id__c, pl_servicenow__SN_Object_Name__c, Name FROM pl_servicenow__Peeklogic_Object_Connect__c
             WHERE pl_servicenow__SN_Object_Id__c ='${servicenowSysId}'
         `
-        const salesforceObjectService = new x_peekl_salesfor_0.SalesforceObjectService();
+        const salesforceObjectService = new x_1955226_peeklo_1.SalesforceObjectService();
         const linkedRecordsList = salesforceObjectService.query(query);
         const salesforceIds = linkedRecordsList.filter(el => el.Name != null).map(el => el.Name);
         const salesforceIdWithObjectType = salesforceObjectService.getObjectsOfRecordsList(salesforceIds);
@@ -149,7 +149,7 @@
             return;
         }
         
-        var configGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+        var configGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_config');
         configGr.addQuery('active', true);
         configGr.query();
         
@@ -167,7 +167,7 @@
             };
         }
         
-        var columnsGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+        var columnsGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_columns');
         columnsGr.addQuery('active', true);
         columnsGr.orderBy('order');
         columnsGr.orderBy('column_name');

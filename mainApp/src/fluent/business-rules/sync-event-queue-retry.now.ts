@@ -4,7 +4,7 @@ import { BusinessRule } from '@servicenow/sdk/core'
 BusinessRule({
     $id: Now.ID['sync_event_queue_retry_rule'],
     name: 'Sync Event Queue Retry',
-    table: 'x_peekl_salesfor_0_sync_event_queue',
+    table: 'x_1955226_peeklo_1_sync_event_queue',
     action: ['update'],
     when: 'async',
     active: true,
