@@ -1,13 +1,13 @@
 import '@servicenow/sdk/global'
 import { Table, StringColumn, ReferenceColumn } from '@servicenow/sdk/core'
 
-export const x_peekl_salesfor_0_task_type_config = Table({
-    name: 'x_peekl_salesfor_0_task_type_config',
+export const x_1955226_peeklo_1_task_type_config = Table({
+    name: 'x_1955226_peeklo_1_task_type_config',
     label: 'Task Type Configuration',
     schema: {
         connection_ref: ReferenceColumn({
             label: 'Salesforce Connection',
-            referenceTable: 'x_peekl_salesfor_0_salesforce_connection',
+            referenceTable: 'x_1955226_peeklo_1_salesforce_connection',
             mandatory: true
         }),
         connection_id: StringColumn({

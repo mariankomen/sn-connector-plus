@@ -2,7 +2,7 @@
 <record_update table="sys_app_module">
   <sys_app_module action="INSERT_OR_UPDATE">
     <sys_id>efe146fcc43248518e3c950c72ebe570</sys_id>
-    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_scope display_value="x_1955226_peeklo_1">e94a8651c36147905bed770d050131e5</sys_scope>
     <sys_update_name>sys_app_module_efe146fcc43248518e3c950c72ebe570</sys_update_name>
     <active>true</active>
     <application>a3259015321b4707bb30f9fe10983f57</application>

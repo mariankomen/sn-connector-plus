@@ -137,7 +137,7 @@ const CreateSalesforceRecord = ({ servicenowTable, servicenowSysId }: CreateSale
     try {
       setSubmitting(true);
       const response = await fetch(
-        '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/create-record',
+        '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/create-record',
         {
           method: 'POST',
           headers: {
@@ -159,7 +159,7 @@ const CreateSalesforceRecord = ({ servicenowTable, servicenowSysId }: CreateSale
           if (createdRecordId && servicenowTable && servicenowSysId && selectedObject) {
             try {
               const linkResponse = await fetch(
-                '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/sync',
+                '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/sync',
                 {
                   method: 'POST',
                   headers: {
@@ -459,7 +459,7 @@ const CreateSalesforceRecord = ({ servicenowTable, servicenowSysId }: CreateSale
 
       try {
         const response = await fetch(
-          '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/sobjects',
+          '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/sobjects',
           {
             headers: {
               'Accept': 'application/json',
@@ -508,7 +508,7 @@ const CreateSalesforceRecord = ({ servicenowTable, servicenowSysId }: CreateSale
 
       try {
         const response = await fetch(
-          `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/record-types?object_name=${encodeURIComponent(selectedObject)}`,
+          `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/record-types?object_name=${encodeURIComponent(selectedObject)}`,
           {
             headers: {
               'Accept': 'application/json',
@@ -609,7 +609,7 @@ const CreateSalesforceRecord = ({ servicenowTable, servicenowSysId }: CreateSale
           return;
         }
 
-        const endpoint = `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/object/layout?object_name=${encodeURIComponent(selectedObject)}&record_type_id=${encodeURIComponent(recordTypeParam)}`;
+        const endpoint = `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/object/layout?object_name=${encodeURIComponent(selectedObject)}&record_type_id=${encodeURIComponent(recordTypeParam)}`;
 
         const response = await fetch(endpoint, {
           headers: {

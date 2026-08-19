@@ -69,7 +69,7 @@ export default function App() {
         }
 
         try {
-            const res = await fetch('/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/connection/status', {
+            const res = await fetch('/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/connection/status', {
                 method: 'GET',
                 headers: {
                     Accept: 'application/json',

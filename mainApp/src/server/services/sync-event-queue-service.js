@@ -7,9 +7,9 @@ SyncEventQueueService.prototype = {
             return false;
         }
         var allowed = {
-            'x_peekl_salesfor_0_salesforce_object_columns': true,
-            'x_peekl_salesfor_0_salesforce_selected_related_objects': true,
-            'x_peekl_salesfor_0_salesforce_related_object_columns': true
+            'x_1955226_peeklo_1_salesforce_object_columns': true,
+            'x_1955226_peeklo_1_salesforce_selected_related_objects': true,
+            'x_1955226_peeklo_1_salesforce_related_object_columns': true
         };
         return !!allowed[tableName];
     },
@@ -22,7 +22,7 @@ SyncEventQueueService.prototype = {
         if (!payloadObj) {
             return null;
         }
-        var queueGr = new GlideRecordSecure('x_peekl_salesfor_0_sync_event_queue');
+        var queueGr = new GlideRecordSecure('x_1955226_peeklo_1_sync_event_queue');
         queueGr.initialize();
         queueGr.setValue('payload', JSON.stringify(payloadObj));
         queueGr.setValue('status', 'pending');
@@ -79,7 +79,7 @@ SyncEventQueueService.prototype = {
             if (eventType === 'cascade_delete') {
                 success = this._handleCascadeDelete(eventData);
             } else {
-                const taskSyncService = new x_peekl_salesfor_0.TaskSyncService();
+                const taskSyncService = new x_1955226_peeklo_1.TaskSyncService();
                 success = taskSyncService.handleQueuedTaskSync(eventData);
             }
         } catch (err) {
@@ -116,14 +116,14 @@ SyncEventQueueService.prototype = {
         let allSuccess = true;
         let totalDeleted = 0;
 
-        var selectedRelatedObjectsTable = 'x_peekl_salesfor_0_salesforce_selected_related_objects';
-        var relatedObjectColumnsTable = 'x_peekl_salesfor_0_salesforce_related_object_columns';
-        var objectConfigTable = 'x_peekl_salesfor_0_salesforce_object_config';
+        var selectedRelatedObjectsTable = 'x_1955226_peeklo_1_salesforce_selected_related_objects';
+        var relatedObjectColumnsTable = 'x_1955226_peeklo_1_salesforce_related_object_columns';
+        var objectConfigTable = 'x_1955226_peeklo_1_salesforce_object_config';
 
         
         if (parentTable === objectConfigTable && childTables.indexOf(selectedRelatedObjectsTable) !== -1) {
             try {
-                var selectedRelatedObjectsGR = new GlideRecordSecure('x_peekl_salesfor_0_salesforce_selected_related_objects');
+                var selectedRelatedObjectsGR = new GlideRecordSecure('x_1955226_peeklo_1_salesforce_selected_related_objects');
                 selectedRelatedObjectsGR.addQuery('object_config', parentSysId);
                 selectedRelatedObjectsGR.query();
                 
@@ -262,7 +262,7 @@ SyncEventQueueService.prototype = {
     },
 
     _updateQueue: function (current, updates) {
-        var queueGr = new GlideRecordSecure('x_peekl_salesfor_0_sync_event_queue');
+        var queueGr = new GlideRecordSecure('x_1955226_peeklo_1_sync_event_queue');
         if (!queueGr.get('sys_id', current.getUniqueValue())) {
             return;
         }

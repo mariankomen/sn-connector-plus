@@ -34,7 +34,7 @@
         }
 
         
-        var objConfigGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+        var objConfigGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_config');
         objConfigGr.addQuery('sf_object_name', objectName);
         objConfigGr.query();
         
@@ -50,7 +50,7 @@
         var objectConfigSysId = objConfigGr.getUniqueValue();
 
         
-        var selectedRelGr = new GlideRecord('x_peekl_salesfor_0_salesforce_selected_related_objects');
+        var selectedRelGr = new GlideRecord('x_1955226_peeklo_1_salesforce_selected_related_objects');
         selectedRelGr.addQuery('object_config', objectConfigSysId);
         selectedRelGr.orderBy('order');
         selectedRelGr.query();
@@ -76,7 +76,7 @@
             return;
         }
 
-        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const connectionService = new x_1955226_peeklo_1.SalesforceConnectionService();
         const lookup = connectionService.getCurrentUserConnection();
         if (!lookup || !lookup.success) {
             response.setStatus(401);
@@ -107,7 +107,7 @@
             return;
         }
 
-        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const oauthService = new x_1955226_peeklo_1.SalesforceOAuthService();
         const accessToken = oauthService.ensureValidAccessToken({
             connection: connection,
             connectionService: connectionService
@@ -168,7 +168,7 @@
                 var selRelSysId = selRelForCols.sys_id;
                 var selectedCols = new Set();
                 
-                var colGr = new GlideRecord('x_peekl_salesfor_0_salesforce_related_object_columns');
+                var colGr = new GlideRecord('x_1955226_peeklo_1_salesforce_related_object_columns');
                 colGr.addQuery('selected_related_object', selRelSysId);
                 colGr.addQuery('active', true);
                 colGr.query();

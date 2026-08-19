@@ -22,7 +22,7 @@
         var objectName = getParam('object_name') || getParam('sf_object_name');
 
         if (!objectConfigSysId && objectName) {
-            var objConfigGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+            var objConfigGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_config');
             objConfigGr.addQuery('sf_object_name', objectName);
             objConfigGr.query();
             if (objConfigGr.next()) {
@@ -46,7 +46,7 @@
             return;
         }
 
-        var objectColumnGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+        var objectColumnGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_columns');
         objectColumnGr.addQuery('object_config', objectConfigSysId);
         objectColumnGr.orderBy('order');
         objectColumnGr.orderBy('column_label');
@@ -65,7 +65,7 @@
             });
         }
 
-        var objConfigGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+        var objConfigGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_config');
         var objectConfig = null;
         if (objConfigGr.get(objectConfigSysId)) {
             objectConfig = {

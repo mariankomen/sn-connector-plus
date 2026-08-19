@@ -108,7 +108,7 @@
             });
         }
 
-        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const connectionService = new x_1955226_peeklo_1.SalesforceConnectionService();
         const lookup = connectionService.getCurrentUserConnection();
 
         if (!lookup || !lookup.success) {
@@ -132,7 +132,7 @@
         }
 
         
-        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const oauthService = new x_1955226_peeklo_1.SalesforceOAuthService();
         const accessToken = oauthService.ensureValidAccessToken({
             connection: connection,
             connectionService: connectionService,

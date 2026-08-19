@@ -36,7 +36,7 @@ const RelatedObjectsSelect: React.FC = () => {
 
       try {
         const response = await fetch(
-          '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/objects',
+          '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/objects',
           {
             headers: {
               'Accept': 'application/json',
@@ -83,7 +83,7 @@ const RelatedObjectsSelect: React.FC = () => {
   const fetchRelatedObjectsForObject = async (objectConfigSysId: string, objectName: string) => {
     try {
       const response = await fetch(
-        `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/related-objects-get?object_name=${encodeURIComponent(objectName)}`,
+        `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/related-objects-get?object_name=${encodeURIComponent(objectName)}`,
         {
           headers: {
             'Accept': 'application/json',
@@ -196,7 +196,7 @@ const RelatedObjectsSelect: React.FC = () => {
       
       
       const response = await fetch(
-        '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/related-objects-select',
+        '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/related-objects-select',
         {
           method: 'POST',
           headers: {

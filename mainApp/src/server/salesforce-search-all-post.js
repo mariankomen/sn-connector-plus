@@ -34,7 +34,7 @@
         
         gs.info('Received request data - filters: ' + JSON.stringify(requestData.filters) + ', object: ' + (requestData.object || requestData.objectName));
 
-        var configGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+        var configGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_config');
         configGr.addQuery('active', true);
         configGr.addQuery('searchable', true);
         configGr.orderBy('order');
@@ -55,7 +55,7 @@
         
         var objectColumns = {};
         var objectColumnMetadata = {}; 
-        var columnsGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+        var columnsGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_columns');
         columnsGr.addQuery('active', true);
         columnsGr.orderBy('order');
         columnsGr.orderBy('column_name');
@@ -93,7 +93,7 @@
             return;
         }
 
-        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const connectionService = new x_1955226_peeklo_1.SalesforceConnectionService();
         const lookup = connectionService.getCurrentUserConnection();
         if (!lookup || !lookup.success) {
             response.setStatus(401);
@@ -124,7 +124,7 @@
             return;
         }
 
-        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const oauthService = new x_1955226_peeklo_1.SalesforceOAuthService();
         const accessToken = oauthService.ensureValidAccessToken({
             connection: connection,
             connectionService: connectionService

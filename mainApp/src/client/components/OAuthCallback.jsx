@@ -4,7 +4,7 @@ import './OAuthCallback.css';
 import Button from './ui/Button';
 import LoadingSpinner from './ui/LoadingSpinner.jsx';
 
-const baseUrl = "/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio";
+const baseUrl = "/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio";
 const APP_HOME_URL = '/sp?id=peeklogic_salesforce_connector_plus';
 
 

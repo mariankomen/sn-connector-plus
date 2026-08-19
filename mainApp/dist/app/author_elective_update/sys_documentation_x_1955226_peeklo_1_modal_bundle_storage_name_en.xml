@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<record_update table="sys_documentation">
+  <sys_documentation action="DELETE">
+    <sys_id>50d360f044de4235bc87a96ee74f50d6</sys_id>
+    <sys_scope display_value="x_1955226_peeklo_1">e94a8651c36147905bed770d050131e5</sys_scope>
+    <sys_update_name>sys_documentation_x_1955226_peeklo_1_modal_bundle_storage_name_en</sys_update_name>
+    <element>name</element>
+    <language>en</language>
+    <name>x_1955226_peeklo_1_modal_bundle_storage</name>
+  </sys_documentation>
+</record_update>

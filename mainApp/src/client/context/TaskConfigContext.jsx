@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import axios from 'axios'
 
 const TaskConfigContext = createContext()
-const baseUrl = "/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio";
+const baseUrl = "/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio";
 
 export function TaskConfigProvider({ isAuthenticated, children }) {
     const [availableTaskTypes, setAvailableTaskTypes] = useState([])

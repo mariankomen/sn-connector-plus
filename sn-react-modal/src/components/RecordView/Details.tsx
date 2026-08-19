@@ -31,7 +31,7 @@ const Details = ({ sf_object_type, sf_record_id }: IRecordModalProps) => {
                 setLoading(true);
                 setError(null);
                 
-                const url = `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/object/detail?sf_record_id=${encodeURIComponent(sf_record_id)}&sf_object_type=${encodeURIComponent(sf_object_type || '')}`;
+                const url = `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/object/detail?sf_record_id=${encodeURIComponent(sf_record_id)}&sf_object_type=${encodeURIComponent(sf_object_type || '')}`;
                 
                 const response = await fetch(url, {
                     headers: {

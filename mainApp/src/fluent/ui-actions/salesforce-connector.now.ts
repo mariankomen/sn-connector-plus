@@ -25,7 +25,7 @@ UiAction({
     },
     script: `function openReactModal() {
     if (g_form.isNewRecord()) return false;
-    var m = new GlideModal('x_peekl_salesfor_0_ServiceNowPage');
+    var m = new GlideModal('x_1955226_peeklo_1_ServiceNowPage');
     m.setTitle('Peeklogic Connector Plus');
     m.setWidth(1200);
     m.setPreference('sysparm_sys_id', g_form.getUniqueValue());

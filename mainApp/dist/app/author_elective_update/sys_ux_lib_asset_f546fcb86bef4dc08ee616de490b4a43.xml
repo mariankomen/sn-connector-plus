@@ -2,8 +2,8 @@
 <record_update>
   <sys_ux_lib_asset action="DELETE">
     <sys_id>f546fcb86bef4dc08ee616de490b4a43</sys_id>
-    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_scope display_value="x_1955226_peeklo_1">e94a8651c36147905bed770d050131e5</sys_scope>
     <sys_update_name>sys_ux_lib_asset_f546fcb86bef4dc08ee616de490b4a43</sys_update_name>
-    <name>x_peekl_salesfor_0/dist/assets/index-CI7xq3sh.js.map</name>
+    <name>x_1955226_peeklo_1/dist/assets/index-CI7xq3sh.js.map</name>
   </sys_ux_lib_asset>
 </record_update>

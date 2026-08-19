@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:5b51471f-1395-4f94-b86d-9c1e335f546c",
+  "serialNumber": "urn:uuid:e1d31f1b-4852-49d9-8d07-b510a883b722",
   "metadata": {
-    "timestamp": "2026-07-16T07:05:26.195Z",
+    "timestamp": "2026-08-12T09:47:13.538Z",
     "tools": {
       "components": [
         {
@@ -21,7 +21,7 @@
       "type": "application",
       "name": "peeklogicconnector",
       "version": "0.0.1",
-      "bom-ref": "pkg:servicenow/peeklogicconnector@0.0.1?sys_scope_id=c0c895442faccb503ee3116e8ea4e308",
+      "bom-ref": "pkg:servicenow/peeklogicconnector@0.0.1?sys_scope_id=e94a8651c36147905bed770d050131e5",
       "licenses": [
         {
           "license": {
@@ -29,13 +29,13 @@
           }
         }
       ],
-      "purl": "pkg:servicenow/peeklogicconnector@0.0.1?sys_scope_id=c0c895442faccb503ee3116e8ea4e308"
+      "purl": "pkg:servicenow/peeklogicconnector@0.0.1?sys_scope_id=e94a8651c36147905bed770d050131e5"
     }
   },
   "components": [],
   "dependencies": [
     {
-      "ref": "pkg:servicenow/peeklogicconnector@0.0.1?sys_scope_id=c0c895442faccb503ee3116e8ea4e308"
+      "ref": "pkg:servicenow/peeklogicconnector@0.0.1?sys_scope_id=e94a8651c36147905bed770d050131e5"
     }
   ]
 }

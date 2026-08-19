@@ -3,7 +3,7 @@ import { ApplicationMenu, Record } from '@servicenow/sdk/core'
 import { salesforceIntegrationUserPaidRole } from '../security/roles.now'
 
 export const peeklogicAppMenu = ApplicationMenu({
-    $id: Now.ID['x_peekl_salesfor_0_app_menu'],
+    $id: Now.ID['x_1955226_peeklo_1_app_menu'],
     title: 'Peeklogic Connector Plus',
     hint: 'Salesforce integration settings and support',
     description: 'Connect and configure Salesforce synchronization',
@@ -14,7 +14,7 @@ export const peeklogicAppMenu = ApplicationMenu({
 })
 
 Record({
-    $id: Now.ID['x_peekl_salesfor_0_app_module'],
+    $id: Now.ID['x_1955226_peeklo_1_app_module'],
     table: 'sys_app_module',
     data: {
         title: 'Salesforce Integration',
@@ -29,7 +29,7 @@ Record({
 })
 
 Record({
-    $id: Now.ID['x_peekl_salesfor_0_support_module'],
+    $id: Now.ID['x_1955226_peeklo_1_support_module'],
     table: 'sys_app_module',
     data: {
         title: 'Contact Support',
@@ -44,7 +44,7 @@ Record({
 })
 
 Record({
-    $id: Now.ID['x_peekl_salesfor_0_privacy_module'],
+    $id: Now.ID['x_1955226_peeklo_1_privacy_module'],
     table: 'sys_app_module',
     data: {
         title: 'App Privacy Policy',

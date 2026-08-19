@@ -2,7 +2,7 @@
 <record_update table="sys_security_acl">
   <sys_security_acl action="INSERT_OR_UPDATE">
     <sys_id>2f342a815af54b96b3c7dbf9b88709e8</sys_id>
-    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_scope display_value="x_1955226_peeklo_1">e94a8651c36147905bed770d050131e5</sys_scope>
     <sys_update_name>sys_security_acl_2f342a815af54b96b3c7dbf9b88709e8</sys_update_name>
     <active>true</active>
     <admin_overrides>true</admin_overrides>
@@ -12,7 +12,7 @@
     <decision_type>allow</decision_type>
     <description/>
     <local_or_existing>Local</local_or_existing>
-    <name>x_peekl_salesfor_0_salesforce_object_config</name>
+    <name>x_1955226_peeklo_1_salesforce_object_config</name>
     <operation>delete</operation>
     <script/>
     <security_attribute/>

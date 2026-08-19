@@ -2,7 +2,7 @@
 <record_update table="sys_module">
   <sys_module action="INSERT_OR_UPDATE">
     <sys_id>0031041bef184e60b3dc57154c2cd613</sys_id>
-    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_scope display_value="x_1955226_peeklo_1">e94a8651c36147905bed770d050131e5</sys_scope>
     <sys_update_name>sys_module_0031041bef184e60b3dc57154c2cd613</sys_update_name>
     <content><![CDATA[const SalesforceConnectionService = Class.create();
 SalesforceConnectionService.prototype = {
@@ -176,7 +176,7 @@ SalesforceConnectionService.prototype = {
             return null;
         }
 
-        var connectionGr = new GlideRecordSecure('x_peekl_salesfor_0_salesforce_connection');
+        var connectionGr = new GlideRecordSecure('x_1955226_peeklo_1_salesforce_connection');
         if (!connectionGr.get(connectionId)) {
             return null;
         }
@@ -189,7 +189,7 @@ SalesforceConnectionService.prototype = {
     },
 
     _getLatestConnectionForUser: function (userId) {
-        var connectionGr = new GlideRecordSecure('x_peekl_salesfor_0_salesforce_connection');
+        var connectionGr = new GlideRecordSecure('x_1955226_peeklo_1_salesforce_connection');
         connectionGr.addQuery('created_by', userId);
         connectionGr.orderByDesc('sys_created_on');
         connectionGr.setLimit(1);
@@ -203,11 +203,11 @@ SalesforceConnectionService.prototype = {
     },
 
     _deleteDependentRecords: function (connectionId) {
-        var syncGr = new GlideRecordSecure('x_peekl_salesfor_0_sync_config');
+        var syncGr = new GlideRecordSecure('x_1955226_peeklo_1_sync_config');
         syncGr.addQuery('connection_ref', connectionId);
         syncGr.deleteMultiple();
 
-        var taskGr = new GlideRecordSecure('x_peekl_salesfor_0_task_type_config');
+        var taskGr = new GlideRecordSecure('x_1955226_peeklo_1_task_type_config');
         taskGr.addQuery('connection_id', connectionId);
         taskGr.deleteMultiple();
     },
@@ -218,7 +218,7 @@ SalesforceConnectionService.prototype = {
             return existing;
         }
 
-        var connectionGr = new GlideRecordSecure('x_peekl_salesfor_0_salesforce_connection');
+        var connectionGr = new GlideRecordSecure('x_1955226_peeklo_1_salesforce_connection');
         connectionGr.initialize();
         connectionGr.setValue('created_by', userId);
         return connectionGr;
@@ -242,7 +242,7 @@ SalesforceConnectionService.prototype = {
 };
 ]]></content>
     <external_source>false</external_source>
-    <path>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/services/salesforce-connection-service.js</path>
-    <sys_name>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/services/salesforce-connection-service.js</sys_name>
+    <path>x_1955226_peeklo_1/peeklogicconnector/0.0.1/src/server/services/salesforce-connection-service.js</path>
+    <sys_name>x_1955226_peeklo_1/peeklogicconnector/0.0.1/src/server/services/salesforce-connection-service.js</sys_name>
   </sys_module>
 </record_update>

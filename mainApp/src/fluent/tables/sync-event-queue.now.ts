@@ -1,8 +1,8 @@
 import '@servicenow/sdk/global'
 import { Table, StringColumn, IntegerColumn } from '@servicenow/sdk/core'
 
-export const x_peekl_salesfor_0_sync_event_queue = Table({
-    name: 'x_peekl_salesfor_0_sync_event_queue',
+export const x_1955226_peeklo_1_sync_event_queue = Table({
+    name: 'x_1955226_peeklo_1_sync_event_queue',
     label: 'Sync Event Queue',
     schema: {
         payload: StringColumn({

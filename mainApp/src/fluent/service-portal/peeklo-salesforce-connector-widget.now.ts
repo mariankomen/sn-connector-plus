@@ -9,7 +9,7 @@ const widgetTemplate = `<div class="x-peekl-salesfor-0-salesforce-integration">
 export const peeklo_salesforce_connector_widget = SPWidget({
     $id: Now.ID['peeklo-salesforce-connector-widget'],
     name: 'Peeklogic Salesforce Connector',
-    id: 'x_peekl_salesfor_0_salesforce_integration',
+    id: 'x_1955226_peeklo_1_salesforce_integration',
     category: 'custom',
     description:
         'Hosts the Peeklogic Salesforce Integration React UI inside Service Portal. sp_page ID must match the app (see connector portal URL in source) so /sp?id=... and OAuth return URLs resolve.',

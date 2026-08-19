@@ -4,7 +4,7 @@ import { BusinessRule } from '@servicenow/sdk/core'
 BusinessRule({
     $id: Now.ID['salesforce-object-config-cascade-delete-rule'],
     name: 'Salesforce Object Config Cascade Delete',
-    table: 'x_peekl_salesfor_0_salesforce_object_config',
+    table: 'x_1955226_peeklo_1_salesforce_object_config',
     action: ['delete'],
     when: 'before',
     active: true,

@@ -11,6 +11,6 @@ BusinessRule({
     order: 100,
     script: Now.include('../../server/business-rules/task-sync-update.js'),
     description: 'Handles task update sync to Salesforce',
-    condition: 'new x_peekl_salesfor_0.TaskSyncService().isTableConfigured(current.getTableName())',
+    condition: 'new x_1955226_peeklo_1.TaskSyncService().isTableConfigured(current.getTableName())',
 })
 

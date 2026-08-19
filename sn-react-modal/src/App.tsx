@@ -24,7 +24,7 @@ export default function App({ctx}: {ctx?: Ctx}) {
 		const fetchSettings = async () => {
 			try {
 				const settingsResponse = await fetch(
-					`/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/settings?servicenow_table=${ctx?.table}`,
+					`/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/settings?servicenow_table=${ctx?.table}`,
 					{
 					headers: {
 						Accept: 'application/json',

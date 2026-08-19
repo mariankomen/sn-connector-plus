@@ -2,12 +2,12 @@
 <record_update table="sys_ws_operation">
   <sys_ws_operation action="INSERT_OR_UPDATE">
     <sys_id>37f8ac10fc4d4b4a93014f2384f31a45</sys_id>
-    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_scope display_value="x_1955226_peeklo_1">e94a8651c36147905bed770d050131e5</sys_scope>
     <sys_update_name>sys_ws_operation_37f8ac10fc4d4b4a93014f2384f31a45</sys_update_name>
     <active>true</active>
     <consumes>application/json,application/xml,text/xml</consumes>
     <consumes_customized>false</consumes_customized>
-    <default_operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/record-types</default_operation_uri>
+    <default_operation_uri>/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/record-types</default_operation_uri>
     <enforce_acl>064a8e03949c49f88bb8321ee55fd0bb</enforce_acl>
     <http_method>GET</http_method>
     <name>/salesforce/record-types</name>
@@ -47,7 +47,7 @@
         }
 
         
-        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const connectionService = new x_1955226_peeklo_1.SalesforceConnectionService();
         const lookup = connectionService.getCurrentUserConnection();
         if (!lookup || !lookup.success) {
             response.setStatus(401);
@@ -80,7 +80,7 @@
         }
 
         
-        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const oauthService = new x_1955226_peeklo_1.SalesforceOAuthService();
         const accessToken = oauthService.ensureValidAccessToken({
             connection: connection,
             connectionService: connectionService
@@ -170,7 +170,7 @@
     }
 })(request, response);
 ]]></operation_script>
-    <operation_uri>/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/record-types</operation_uri>
+    <operation_uri>/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/record-types</operation_uri>
     <produces>application/json,application/xml,text/xml</produces>
     <produces_customized>false</produces_customized>
     <relative_path>/salesforce/record-types</relative_path>

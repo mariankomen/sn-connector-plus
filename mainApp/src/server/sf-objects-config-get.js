@@ -2,7 +2,7 @@
     response.setContentType('application/json');
     
     try {
-        var objectConfigGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+        var objectConfigGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_config');
         objectConfigGr.addQuery('active', true);
         objectConfigGr.orderBy('order');
         objectConfigGr.orderBy('sf_object_label');

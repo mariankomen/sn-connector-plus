@@ -2,7 +2,7 @@
 <record_update table="sys_module">
   <sys_module action="INSERT_OR_UPDATE">
     <sys_id>32ae24e4137f4d8f97bdbf6cf29b1b36</sys_id>
-    <sys_scope display_value="x_peekl_salesfor_0">c0c895442faccb503ee3116e8ea4e308</sys_scope>
+    <sys_scope display_value="x_1955226_peeklo_1">e94a8651c36147905bed770d050131e5</sys_scope>
     <sys_update_name>sys_module_32ae24e4137f4d8f97bdbf6cf29b1b36</sys_update_name>
     <content><![CDATA[(function process(request, response) {
 
@@ -77,7 +77,7 @@
             return;
         }
 
-        const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const connectionService = new x_1955226_peeklo_1.SalesforceConnectionService();
         const lookup = connectionService.getCurrentUserConnection();
         if (!lookup || !lookup.success) {
             response.setStatus(401);
@@ -108,7 +108,7 @@
             return;
         }
 
-        const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+        const oauthService = new x_1955226_peeklo_1.SalesforceOAuthService();
         const accessToken = oauthService.ensureValidAccessToken({
             connection: connection,
             connectionService: connectionService
@@ -128,7 +128,7 @@
             SELECT Id, pl_servicenow__SN_Object_Id__c, pl_servicenow__SN_Object_Name__c, Name FROM pl_servicenow__Peeklogic_Object_Connect__c
             WHERE pl_servicenow__SN_Object_Id__c ='${servicenowSysId}'
         `
-        const salesforceObjectService = new x_peekl_salesfor_0.SalesforceObjectService();
+        const salesforceObjectService = new x_1955226_peeklo_1.SalesforceObjectService();
         const linkedRecordsList = salesforceObjectService.query(query);
         const salesforceIds = linkedRecordsList.filter(el => el.Name != null).map(el => el.Name);
         const salesforceIdWithObjectType = salesforceObjectService.getObjectsOfRecordsList(salesforceIds);
@@ -155,7 +155,7 @@
             return;
         }
         
-        var configGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+        var configGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_config');
         configGr.addQuery('active', true);
         configGr.query();
         
@@ -173,7 +173,7 @@
             };
         }
         
-        var columnsGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_columns');
+        var columnsGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_columns');
         columnsGr.addQuery('active', true);
         columnsGr.orderBy('order');
         columnsGr.orderBy('column_name');
@@ -351,7 +351,7 @@
 
 ]]></content>
     <external_source>false</external_source>
-    <path>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/salesforce-record-link-get.js</path>
-    <sys_name>x_peekl_salesfor_0/peeklogicconnector/0.0.1/src/server/salesforce-record-link-get.js</sys_name>
+    <path>x_1955226_peeklo_1/peeklogicconnector/0.0.1/src/server/salesforce-record-link-get.js</path>
+    <sys_name>x_1955226_peeklo_1/peeklogicconnector/0.0.1/src/server/salesforce-record-link-get.js</sys_name>
   </sys_module>
 </record_update>

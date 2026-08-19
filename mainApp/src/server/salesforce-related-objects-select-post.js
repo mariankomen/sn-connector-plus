@@ -40,7 +40,7 @@
 
         
         if (!objectConfigSysId && objectName) {
-            var objCfgGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+            var objCfgGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_config');
             objCfgGr.addQuery('sf_object_name', objectName);
             objCfgGr.query();
             if (objCfgGr.next()) {
@@ -128,7 +128,7 @@
         var deleteFailCount = 0;
 
 
-        var existingGr = new GlideRecord('x_peekl_salesfor_0_salesforce_selected_related_objects');
+        var existingGr = new GlideRecord('x_1955226_peeklo_1_salesforce_selected_related_objects');
         existingGr.addQuery('object_config', objectConfigSysId);
         existingGr.query();
 
@@ -184,19 +184,19 @@
             gs.info('[Peeklo] Related Objects Select: Attempting to delete - sys_id: ' + relToDelete.sys_id + ', relationship_name: ' + relToDelete.relationship_name);
             
             try {
-                var queueService = new x_peekl_salesfor_0.SyncEventQueueService();
+                var queueService = new x_1955226_peeklo_1.SyncEventQueueService();
                 var cascadePayload = {
                     eventType: 'cascade_delete',
-                    parentTable: 'x_peekl_salesfor_0_salesforce_selected_related_objects',
+                    parentTable: 'x_1955226_peeklo_1_salesforce_selected_related_objects',
                     parentSysId: relToDelete.sys_id,
                     childTables: [
-                        'x_peekl_salesfor_0_salesforce_related_object_columns'
+                        'x_1955226_peeklo_1_salesforce_related_object_columns'
                     ]
                 };
                 queueService.enqueuePayload(cascadePayload);
                 gs.info('[Peeklo] Related Objects Select: Queued cascade delete for child columns of relationship_name: ' + relToDelete.relationship_name);
                 
-                var delGr = new GlideRecord('x_peekl_salesfor_0_salesforce_selected_related_objects');
+                var delGr = new GlideRecord('x_1955226_peeklo_1_salesforce_selected_related_objects');
                 delGr.addQuery('object_config', objectConfigSysId);
                 delGr.addQuery('relationship_name', relToDelete.relationship_name);
                 delGr.setWorkflow(false);
@@ -207,7 +207,7 @@
                 gs.info('[Peeklo] Related Objects Select: deleteMultiple() returned: ' + deletedNum + ' for relationship_name: ' + relToDelete.relationship_name);
                 
                 
-                var verifyGr = new GlideRecord('x_peekl_salesfor_0_salesforce_selected_related_objects');
+                var verifyGr = new GlideRecord('x_1955226_peeklo_1_salesforce_selected_related_objects');
                 verifyGr.addQuery('object_config', objectConfigSysId);
                 verifyGr.addQuery('relationship_name', relToDelete.relationship_name);
                 verifyGr.query();
@@ -246,7 +246,7 @@
                 
                 if (errorMsg.indexOf('DeleteRecoveryManager') !== -1 || errorMsg.indexOf('booleanValue') !== -1) {
                     gs.warn('[Peeklo] Related Objects Select: DeleteRecoveryManager error detected, verifying deletion...');
-                    var verifyGr = new GlideRecord('x_peekl_salesfor_0_salesforce_selected_related_objects');
+                    var verifyGr = new GlideRecord('x_1955226_peeklo_1_salesforce_selected_related_objects');
                     verifyGr.addQuery('object_config', objectConfigSysId);
                     verifyGr.addQuery('relationship_name', relToDelete.relationship_name);
                     verifyGr.query();
@@ -298,7 +298,7 @@
             };
 
             try {
-                var selGr = new GlideRecord('x_peekl_salesfor_0_salesforce_selected_related_objects');
+                var selGr = new GlideRecord('x_1955226_peeklo_1_salesforce_selected_related_objects');
                 selGr.addQuery('object_config', objectConfigSysId);
                 selGr.addQuery('relationship_name', relItem.relationship_name);
                 selGr.query();

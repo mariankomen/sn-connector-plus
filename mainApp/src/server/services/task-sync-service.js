@@ -74,7 +74,7 @@ TaskSyncService.prototype = {
                 return false;
             }
 
-            const connectionService = new x_peekl_salesfor_0.SalesforceConnectionService();
+            const connectionService = new x_1955226_peeklo_1.SalesforceConnectionService();
             let resolvedConnectionId = connectionId;
             if (!resolvedConnectionId) {
                 const connectionLookup = connectionService.getCurrentUserConnection();
@@ -106,7 +106,7 @@ TaskSyncService.prototype = {
                 return false;
             }
             
-            const oauthService = new x_peekl_salesfor_0.SalesforceOAuthService();
+            const oauthService = new x_1955226_peeklo_1.SalesforceOAuthService();
             const accessToken = oauthService.ensureValidAccessToken({
                 connection: connection,
                 connectionService: connectionService
@@ -169,7 +169,7 @@ TaskSyncService.prototype = {
                 return false;
             }
 
-            var taskTypeConfigGr = new GlideRecordSecure('x_peekl_salesfor_0_task_type_config');
+            var taskTypeConfigGr = new GlideRecordSecure('x_1955226_peeklo_1_task_type_config');
             taskTypeConfigGr.addQuery('connection_id', connectionId);
             taskTypeConfigGr.addQuery('table_name', tableName);
             taskTypeConfigGr.setLimit(1);
@@ -187,7 +187,7 @@ TaskSyncService.prototype = {
     isTableConfigured: function(tableName) {
         try {
             if (!tableName) return false;
-            var gr = new GlideRecordSecure('x_peekl_salesfor_0_task_type_config');
+            var gr = new GlideRecordSecure('x_1955226_peeklo_1_task_type_config');
             gr.addQuery('table_name', tableName);
             gr.setLimit(1);
             gr.query();

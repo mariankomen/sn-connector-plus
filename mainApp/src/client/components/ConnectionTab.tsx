@@ -5,7 +5,7 @@ import './ConnectionTab.css'
 import Button from './ui/Button'
 
 const DEFAULT_SF_LOGIN_URL = 'https://login.salesforce.com/services/oauth2'
-const apiBaseUrl = '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio'
+const apiBaseUrl = '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio'
 
 const userToken = () => (window as Window & { g_ck?: string }).g_ck || ''
 

@@ -54,7 +54,7 @@ const RelatedObjectsColumnSelect: React.FC = () => {
 
       try {
         const response = await fetch(
-          '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/objects',
+          '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/objects',
           {
             headers: {
               'Accept': 'application/json',
@@ -101,7 +101,7 @@ const RelatedObjectsColumnSelect: React.FC = () => {
     try {
       
       const response = await fetch(
-        `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/related-objects-columns-get?object_name=${encodeURIComponent(objectName)}`,
+        `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/related-objects-columns-get?object_name=${encodeURIComponent(objectName)}`,
         {
           headers: {
             'Accept': 'application/json',
@@ -279,8 +279,8 @@ const RelatedObjectsColumnSelect: React.FC = () => {
 
       
       const url = colsForThisRelObj.length === 0
-        ? `/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/related-objects-columns-select?object_name=${encodeURIComponent(objRelObjs.object.sf_object_name)}&relationship_name=${encodeURIComponent(relationshipName)}`
-        : '/api/x_peekl_salesfor_0/x_peekl_salesfor_0_salesforce_integratio/salesforce/related-objects-columns-select';
+        ? `/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/related-objects-columns-select?object_name=${encodeURIComponent(objRelObjs.object.sf_object_name)}&relationship_name=${encodeURIComponent(relationshipName)}`
+        : '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio/salesforce/related-objects-columns-select';
       
       const response = await fetch(url, {
         method: 'POST',

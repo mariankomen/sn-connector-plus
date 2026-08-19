@@ -5,13 +5,13 @@
         return;
     }
 
-    var queueService = new x_peekl_salesfor_0.SyncEventQueueService();
+    var queueService = new x_1955226_peeklo_1.SyncEventQueueService();
     var payload = {
         eventType: 'cascade_delete',
-        parentTable: 'x_peekl_salesfor_0_salesforce_selected_related_objects',
+        parentTable: 'x_1955226_peeklo_1_salesforce_selected_related_objects',
         parentSysId: sysId,
         childTables: [
-            'x_peekl_salesfor_0_salesforce_related_object_columns'
+            'x_1955226_peeklo_1_salesforce_related_object_columns'
             
         ]
     };

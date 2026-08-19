@@ -3,7 +3,7 @@
     const writer = response.getStreamWriter();
     
     try {
-        const connectionHelper = new x_peekl_salesfor_0.SalesforceConnectionService();
+        const connectionHelper = new x_1955226_peeklo_1.SalesforceConnectionService();
         const activeConnection = connectionHelper.getCurrentUserConnection();
         if (!activeConnection.success) {
             response.setStatus(401);
@@ -27,7 +27,7 @@
             return;
         }
         
-        const deleteGr = new GlideRecord('x_peekl_salesfor_0_task_type_config');
+        const deleteGr = new GlideRecord('x_1955226_peeklo_1_task_type_config');
         deleteGr.addQuery('connection_id', connectionId);
         deleteGr.deleteMultiple();
         
@@ -43,7 +43,7 @@
             }
             
             try {
-                const newGr = new GlideRecord('x_peekl_salesfor_0_task_type_config');
+                const newGr = new GlideRecord('x_1955226_peeklo_1_task_type_config');
                 newGr.initialize();
                 newGr.setValue('connection_id', connectionId);
                 newGr.setValue('table_name', taskType.table_name);

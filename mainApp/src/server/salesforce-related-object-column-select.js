@@ -113,7 +113,7 @@
         
         if (data.length === 0 && objectNameFromQuery && relationshipNameFromQuery) {
             
-            var objConfigGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+            var objConfigGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_config');
             objConfigGr.addQuery('sf_object_name', objectNameFromQuery);
             objConfigGr.query();
             
@@ -129,7 +129,7 @@
             var objectConfigSysId = objConfigGr.getUniqueValue();
 
             
-            var selRelGr = new GlideRecord('x_peekl_salesfor_0_salesforce_selected_related_objects');
+            var selRelGr = new GlideRecord('x_1955226_peeklo_1_salesforce_selected_related_objects');
             selRelGr.addQuery('object_config', objectConfigSysId);
             selRelGr.addQuery('relationship_name', relationshipNameFromQuery);
             selRelGr.query();
@@ -212,7 +212,7 @@
                     }
 
                     
-                    var objConfigGr = new GlideRecord('x_peekl_salesfor_0_salesforce_object_config');
+                    var objConfigGr = new GlideRecord('x_1955226_peeklo_1_salesforce_object_config');
                     objConfigGr.addQuery('sf_object_name', objectName);
                     objConfigGr.query();
                     
@@ -228,7 +228,7 @@
                     var objectConfigSysId = objConfigGr.getUniqueValue();
 
                     
-                    var selRelGr = new GlideRecord('x_peekl_salesfor_0_salesforce_selected_related_objects');
+                    var selRelGr = new GlideRecord('x_1955226_peeklo_1_salesforce_selected_related_objects');
                     selRelGr.addQuery('object_config', objectConfigSysId);
                     selRelGr.addQuery('relationship_name', relationshipName);
                     selRelGr.query();
@@ -276,7 +276,7 @@
             }
 
             
-            var existingGr = new GlideRecord('x_peekl_salesfor_0_salesforce_related_object_columns');
+            var existingGr = new GlideRecord('x_1955226_peeklo_1_salesforce_related_object_columns');
             existingGr.addQuery('selected_related_object', selRelObjId);
             existingGr.query();
 
@@ -296,7 +296,7 @@
             for (var d = 0; d < existingColumnsToDelete.length; d++) {
                 var colToDelete = existingColumnsToDelete[d];
                 try {
-                    var deleteGr = new GlideRecord('x_peekl_salesfor_0_salesforce_related_object_columns');
+                    var deleteGr = new GlideRecord('x_1955226_peeklo_1_salesforce_related_object_columns');
                     deleteGr.addQuery('selected_related_object', selRelObjId);
                     deleteGr.addQuery('column_name', colToDelete.column_name);
                     deleteGr.setWorkflow(false);
@@ -324,7 +324,7 @@
                 };
 
                 
-                var checkGr = new GlideRecord('x_peekl_salesfor_0_salesforce_related_object_columns');
+                var checkGr = new GlideRecord('x_1955226_peeklo_1_salesforce_related_object_columns');
                 checkGr.addQuery('selected_related_object', item.selected_related_object);
                 checkGr.addQuery('column_name', item.column_name);
                 checkGr.query();
@@ -340,7 +340,7 @@
                         sysId = gr.getUniqueValue();
                     } else {
                         
-                        gr = new GlideRecord('x_peekl_salesfor_0_salesforce_related_object_columns');
+                        gr = new GlideRecord('x_1955226_peeklo_1_salesforce_related_object_columns');
                         gr.initialize();
                     }
 

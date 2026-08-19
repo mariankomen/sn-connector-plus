@@ -2,13 +2,13 @@ import '@servicenow/sdk/global'
 import { Table, StringColumn, BooleanColumn, ReferenceColumn } from '@servicenow/sdk/core'
 
 
-export const x_peekl_salesfor_0_sync_config = Table({
-    name: 'x_peekl_salesfor_0_sync_config',
+export const x_1955226_peeklo_1_sync_config = Table({
+    name: 'x_1955226_peeklo_1_sync_config',
     label: 'Sync Configuration',
     schema: {
         connection_ref: ReferenceColumn({
             label: 'Salesforce Connection',
-            referenceTable: 'x_peekl_salesfor_0_salesforce_connection',
+            referenceTable: 'x_1955226_peeklo_1_salesforce_connection',
             mandatory: true
         }),
         organization: StringColumn({
