@@ -3,8 +3,14 @@ import axios from 'axios'
 import '../app.css'
 import './ConnectionTab.css'
 import Button from './ui/Button'
+import { getConnectorPortalUrl } from '../connectorPortalUrl'
 
-const DEFAULT_SF_LOGIN_URL = 'https://login.salesforce.com/services/oauth2'
+type SalesforceEnvironment = 'production' | 'sandbox'
+
+const SF_LOGIN_URLS: Record<SalesforceEnvironment, string> = {
+    production: 'https://login.salesforce.com',
+    sandbox: 'https://test.salesforce.com',
+}
 const apiBaseUrl = '/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integratio'
 
 const userToken = () => (window as Window & { g_ck?: string }).g_ck || ''
@@ -41,20 +47,24 @@ export default function ConnectionTab({
 }: ConnectionTabProps) {
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
+    const [environment, setEnvironment] = useState<SalesforceEnvironment>('production')
     const [credentials, setCredentials] = useState({
         client_id: '',
         client_secret: '',
-        redirect_uri: '',
     })
 
     const handleLogin = async () => {
-        if (!credentials.client_id || !credentials.client_secret || !credentials.redirect_uri) {
-            setError('❌ Please enter Client ID, Client Secret, and Redirect URI')
+        if (!credentials.client_id || !credentials.client_secret) {
+            setError('❌ Please enter Client ID and Client Secret')
             return
         }
 
         setLoading(true)
         setError('')
+
+        // Redirect URI is always this connector page; it must match the Callback URL in the Salesforce app
+        const redirectUri = getConnectorPortalUrl()
+        const loginUrl = SF_LOGIN_URLS[environment]
 
         try {
             const response = await axios.post(
@@ -62,7 +72,8 @@ export default function ConnectionTab({
                 {
                     clientId: credentials.client_id,
                     clientSecret: credentials.client_secret,
-                    redirectUri: credentials.redirect_uri,
+                    redirectUri,
+                    loginUrl,
                 },
                 {
                     headers: {
@@ -96,13 +107,13 @@ export default function ConnectionTab({
         const params = new URLSearchParams({
             response_type: 'code',
             client_id: credentials.client_id,
-            redirect_uri: credentials.redirect_uri,
+            redirect_uri: redirectUri,
             code_challenge: codeChallenge,
             code_challenge_method: 'S256',
             prompt: 'login',
         })
 
-        const authorizationUrl = `${DEFAULT_SF_LOGIN_URL}/authorize?${params.toString()}`
+        const authorizationUrl = `${loginUrl}/services/oauth2/authorize?${params.toString()}`
         console.log(`authorizationUrl: ${authorizationUrl}`)
         window.location.href = authorizationUrl
     }
@@ -165,6 +176,17 @@ export default function ConnectionTab({
             )}
             <div>
                 <div className="form-group">
+                    <label htmlFor="environment">Environment *</label>
+                    <select
+                        id="environment"
+                        value={environment}
+                        onChange={(e) => setEnvironment(e.target.value as SalesforceEnvironment)}
+                    >
+                        <option value="production">Production</option>
+                        <option value="sandbox">Sandbox</option>
+                    </select>
+                </div>
+                <div className="form-group">
                     <label htmlFor="client_id">Client ID (Consumer Key) *</label>
                     <input
                         type="text"
@@ -187,15 +209,9 @@ export default function ConnectionTab({
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="redirect_uri">Redirect URI *</label>
-                    <input
-                        type="text"
-                        id="redirect_uri"
-                        value={credentials.redirect_uri}
-                        onChange={(e) => setCredentials({ ...credentials, redirect_uri: e.target.value })}
-                        placeholder="Enter your redirect URI. This must match the Callback URL configured in your Salesforce Connected App"
-                        required
-                    />
+                    <small>
+                        Callback URL for your Salesforce app: <code>{getConnectorPortalUrl()}</code>
+                    </small>
                 </div>
                 <Button variant="success" onClick={handleLogin} disabled={loading} loading={loading}>
                     Connect

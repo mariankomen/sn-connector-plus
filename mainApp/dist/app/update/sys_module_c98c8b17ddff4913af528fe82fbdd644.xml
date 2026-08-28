@@ -42,7 +42,8 @@
             codeVerifier,
             clientId: connection.client_id,
             clientSecret: connection.client_secret,
-            redirectUri: connection.redirect_uri
+            redirectUri: connection.redirect_uri,
+            loginUrl: connection.login_url
         });
         if (!tokenResult.success) {
             response.setStatus(500);

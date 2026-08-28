@@ -8,7 +8,7 @@ const baseUrl = "/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integrati
 const APP_HOME_URL = '/sp?id=peeklogic_salesforce_connector_plus';
 
 
-export default function OAuthCallback({ code }) {
+export default function OAuthCallback({ code, oauthError, oauthErrorDescription }) {
     const [status, setStatus] = useState('processing');
     const [message, setMessage] = useState('Processing authorization...');
 
@@ -21,6 +21,14 @@ export default function OAuthCallback({ code }) {
 
     const handleCallback = async () => {
         try {
+            if (oauthError) {
+                // Salesforce denied the authorization (wrong org, app not installed, user declined, etc.)
+                localStorage.removeItem("salesforce_code_verifier");
+                setStatus('error');
+                setMessage('Salesforce authorization failed: ' + (oauthErrorDescription || oauthError));
+                return;
+            }
+
             if (!code || !connectionId) {
                 setStatus('error');
                 setMessage('Code or connection id is missing');

@@ -1,14 +1,21 @@
 const SalesforceOAuthService = Class.create();
 SalesforceOAuthService.prototype = {
     initialize: function () {
-        this.baseUrl = 'https://login.salesforce.com/services/oauth2';
+        this.defaultLoginUrl = 'https://login.salesforce.com';
         this.accessTokenTTLMinutes = 60;
+    },
+
+    // Login host depends on the environment (production vs sandbox) chosen on the connection.
+    // The token endpoint must be on the same host that issued the authorization code.
+    _getTokenEndpoint: function (loginUrl) {
+        const base = (loginUrl || this.defaultLoginUrl).replace(/\/+$/, '');
+        return base + '/services/oauth2/token';
     },
 
     exchangeCodeForToken: function (params) {
         try {
             const request = new sn_ws.RESTMessageV2();
-            request.setEndpoint(`${this.baseUrl}/token`);
+            request.setEndpoint(this._getTokenEndpoint(params.loginUrl));
             request.setHttpMethod('POST');
             request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
@@ -69,7 +76,7 @@ SalesforceOAuthService.prototype = {
             }
 
             const request = new sn_ws.RESTMessageV2();
-            request.setEndpoint(`${this.baseUrl}/token`);
+            request.setEndpoint(this._getTokenEndpoint(params.loginUrl));
             request.setHttpMethod('POST');
             request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
@@ -121,7 +128,8 @@ SalesforceOAuthService.prototype = {
             refreshToken: connection.refresh_token,
             clientId: connection.client_id,
             clientSecret: connection.client_secret,
-            redirectUri: connection.redirect_uri
+            redirectUri: connection.redirect_uri,
+            loginUrl: connection.login_url
         });
         if (!refreshResult || !refreshResult.access_token) {
             gs.error('SalesforceOAuthService.ensureValidAccessToken: Failed to refresh Salesforce access token');
