@@ -21,6 +21,7 @@
     try {
         const code = body.code;
         const connectionId = body.connectionId;
+        const codeVerifier = body.codeVerifier;
         
         if (!code || !connectionId) {
             response.setStatus(400);
@@ -45,9 +46,11 @@
 
         const tokenResult = oauthService.exchangeCodeForToken({
             code,
+            codeVerifier,
             clientId: connection.client_id,
             clientSecret: connection.client_secret,
-            redirectUri: connection.redirect_uri
+            redirectUri: connection.redirect_uri,
+            loginUrl: connection.login_url
         });
         if (!tokenResult.success) {
             response.setStatus(500);

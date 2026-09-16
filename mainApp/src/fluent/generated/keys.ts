@@ -1212,6 +1212,15 @@ declare global {
                         }
                     },
                     {
+                        table: 'sys_documentation'
+                        id: '1ad86e3cba9c49abbdd2667747f403e7'
+                        key: {
+                            name: 'x_1955226_peeklo_1_salesforce_connection'
+                            element: 'login_url'
+                            language: 'en'
+                        }
+                    },
+                    {
                         table: 'ua_table_licensing_config'
                         id: '1b56dde89f374f21a8476bb68b5784dc'
                         deleted: true
@@ -2524,6 +2533,14 @@ declare global {
                             name: 'x_1955226_peeklo_1_sync_config'
                             element: 'sync_create'
                             language: 'en'
+                        }
+                    },
+                    {
+                        table: 'sys_dictionary'
+                        id: '7c6b01dcbc2d4848ae3e94c679bcfd2e'
+                        key: {
+                            name: 'x_1955226_peeklo_1_salesforce_connection'
+                            element: 'login_url'
                         }
                     },
                     {

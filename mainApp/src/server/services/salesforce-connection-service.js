@@ -43,6 +43,7 @@ SalesforceConnectionService.prototype = {
                     client_id: record.getValue('client_id'),
                     client_secret: record.getValue('client_secret'),
                     redirect_uri: record.getValue('redirect_uri'),
+                    login_url: record.getValue('login_url'),
                     instance_url: record.getValue('instance_url')
                 }
             };
@@ -94,6 +95,10 @@ SalesforceConnectionService.prototype = {
             record.setValue('client_id', connectionData.client_id);
             record.setValue('client_secret', connectionData.client_secret);
             record.setValue('redirect_uri', connectionData.redirect_uri || '');
+
+            if (connectionData.login_url !== undefined) {
+                record.setValue('login_url', connectionData.login_url || '');
+            }
 
             if (connectionData.instance_url || record.isNewRecord()) {
                 record.setValue('instance_url', connectionData.instance_url || '');
@@ -224,6 +229,7 @@ SalesforceConnectionService.prototype = {
             client_id: record.client_id.getDecryptedValue(),
             client_secret: record.client_secret.getDecryptedValue(),
             redirect_uri: record.getValue('redirect_uri'),
+            login_url: record.getValue('login_url'),
             access_token: record.access_token.getDecryptedValue(),
             refresh_token: record.refresh_token.getDecryptedValue(),
             access_token_expires_at: record.getValue('access_token_expires_at'),

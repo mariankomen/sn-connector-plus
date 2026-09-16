@@ -14,6 +14,9 @@ const VALID_TABS = ['connection', 'settings', 'support', 'privacy'];
 export default function App() {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
+    // Salesforce redirects back with error/error_description instead of code when authorization fails
+    const oauthError = urlParams.get('error');
+    const oauthErrorDescription = urlParams.get('error_description');
     const initialTab = VALID_TABS.includes(urlParams.get('tab') || '')
         ? urlParams.get('tab')!
         : 'connection';
@@ -102,7 +105,7 @@ export default function App() {
     };
 
     useEffect(() => {
-        if (code) {
+        if (code || oauthError) {
             setIsCallback(true);
             setAuthLoading(false);
             return;
@@ -116,7 +119,11 @@ export default function App() {
         return (
             <div className="salesforce-integration-app">
                 {renderHeader()}
-                <OAuthCallback code={code} />
+                <OAuthCallback
+                    code={code}
+                    oauthError={oauthError}
+                    oauthErrorDescription={oauthErrorDescription}
+                />
             </div>
         );
     }

@@ -27,6 +27,10 @@ export const x_1955226_peeklo_1_salesforce_connection = Table({
             label: 'Redirect URI',
             maxLength: 500
         }),
+        login_url: StringColumn({
+            label: 'Salesforce Login URL',
+            maxLength: 255
+        }),
         salesforce_user_id: StringColumn({
             label: 'Salesforce User ID',
             maxLength: 255

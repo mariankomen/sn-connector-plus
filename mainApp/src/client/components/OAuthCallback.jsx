@@ -8,11 +8,12 @@ const baseUrl = "/api/x_1955226_peeklo_1/x_1955226_peeklo_1_salesforce_integrati
 const APP_HOME_URL = '/sp?id=peeklogic_salesforce_connector_plus';
 
 
-export default function OAuthCallback({ code }) {
+export default function OAuthCallback({ code, oauthError, oauthErrorDescription }) {
     const [status, setStatus] = useState('processing');
     const [message, setMessage] = useState('Processing authorization...');
 
     const connectionId = localStorage.getItem("salesforce_connection_id");
+    const codeVerifier = localStorage.getItem("salesforce_code_verifier");
 
     useEffect(() => {
         handleCallback();
@@ -20,6 +21,14 @@ export default function OAuthCallback({ code }) {
 
     const handleCallback = async () => {
         try {
+            if (oauthError) {
+                // Salesforce denied the authorization (wrong org, app not installed, user declined, etc.)
+                localStorage.removeItem("salesforce_code_verifier");
+                setStatus('error');
+                setMessage('Salesforce authorization failed: ' + (oauthErrorDescription || oauthError));
+                return;
+            }
+
             if (!code || !connectionId) {
                 setStatus('error');
                 setMessage('Code or connection id is missing');
@@ -28,7 +37,8 @@ export default function OAuthCallback({ code }) {
             
             const response = await axios.post(`${baseUrl}/auth`, {
                 code,
-                connectionId
+                connectionId,
+                codeVerifier
             }, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -37,10 +47,11 @@ export default function OAuthCallback({ code }) {
                 }
             });
             if (response.data.access_token) {
+                localStorage.removeItem("salesforce_code_verifier");
                 setStatus('success');
                 setMessage('✅ Successfully connected to Salesforce! Redirecting...');
-                
-               
+
+
                 window.location.href = APP_HOME_URL;
             } else {
                 const errorText = response.data.error || response.data.message || 'Failed to complete authorization';
